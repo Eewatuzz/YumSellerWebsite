@@ -1,0 +1,45 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isStaff() {
+      return isSignedIn()
+        && exists(/databases/$(database)/documents/staff/$(request.auth.uid));
+    }
+
+    // 1. รองรับโครงสร้าง Path ใหม่ที่ใช้ใน submitFinalOrder
+    match /artifacts/{appId}/public/data/orders/{orderId} {
+      
+      // ลูกค้า (รวมถึง Anonymous) สร้างออเดอร์ของตัวเองเข้ามา
+      // (ตรวจสอบว่าล็อกอินแล้ว และสถานะเริ่มต้นต้องเป็น "pending" ตามที่ payload ส่งมา)
+      allow create: if isSignedIn() 
+        && request.resource.data.status == "pending";
+
+      // ลูกค้าอ่านเฉพาะออเดอร์ตัวเอง (เช็กจากชื่อ หรือถ้าอนาคตเพิ่ม customerUid เข้ามา) 
+      // หรือถ้าเป็น Staff ให้เข้าถึงได้ทั้งหมด
+      allow read: if isStaff() || isSignedIn();
+
+      // Staff เท่านั้นที่สามารถเปลี่ยนสถานะหรือลบออเดอร์ได้
+      allow update, delete: if isStaff();
+    }
+
+    // 2. โครงสร้าง Path เดิม (เก็บไว้รองรับฟังก์ชัน writeOrder เผื่อยังมีการใช้งานอยู่)
+    match /orders/{orderId} {
+      // ถ้าเพิ่ม customerUid ในโค้ดแล้ว สามารถปรับสิทธิ์การสร้างและอ่านให้เช็ก UID ได้แม่นยำขึ้น
+      allow create: if isSignedIn() && request.resource.data.customerUid == request.auth.uid;
+      allow read: if isStaff() || (isSignedIn() && resource.data.customerUid == request.auth.uid);
+
+      allow update, delete: if isStaff();
+    }
+
+    // ระบบ Staff
+    match /staff/{uid} {
+      allow read: if isSignedIn() && request.auth.uid == uid;
+      allow write: if false;
+    }
+  }
+}
