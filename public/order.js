@@ -4,70 +4,57 @@ import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/12
 import { addDoc, collection, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
 import { connectFirestoreEmulator } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
 
-// Global state and references variables setup
+// Application Master Configuration & State
 const state = {
     currentStep: 1,
-    promptPayNumber: '0812345678', // editable default (shop's PromptPay number)
+    promptPayNumber: '0812345678', // Shop's PromptPay Phone Number
     order: {
-        base: 'ไหลบัว', // Default base
-        addons: [],     // toppings selection, structure: { name: string, price: number, quantity: number }
-        spiciness: 'เผ็ดกลาง',
-        preference: 'รสเข้มข้นกลมกล่อม',
-        custName: '',
-        custPhone: '',
-        type: 'delivery', // delivery or pickup
-        address: '',
-        time: '',
-        note: '',
-        slipBase64: '',
-        totalPrice: 80, // Default base 40 + delivery 40
+        sauce: 'น้ำยำออริจินัล', // Default selected sauce
+        addons: [],            // List of selected ingredients { name: string, price: number, quantity: number }
+        spiciness: 'เผ็ดกลาง', // Spicy level default
+        custName: '',          // Customer name
+        custPhone: '',         // Customer phone number
+        dormLocation: '',      // Selectable dorm (หอหญิง 1 or หอชาย 4)
+        note: '',              // Cooking notes
+        slipBase64: '',        // Encoded proof slip image
+        totalPrice: 10,        // Default price is delivery fee (10 Baht)
     }
 };
 
-// Standard Yam Custom Ingredients List definitions
-const INGREDIENTS = {
-    bases: [
-        { id: 'lotus', name: 'ไหลบัว', icon: '🎋' },
-        { id: 'glass-noodles', name: 'เส้นแก้ว', icon: '🍜' },
-        { id: 'vermicelli', name: 'วุ้นเส้น', icon: '🍜' },
-        { id: 'instant-noodles', name: 'เส้นมาม่า', icon: '🍜' }
-    ],
-    meats: [
-        { id: 'pork-sausage', name: 'หมูยอ', price: 10, icon: '🍥' },
-        { id: 'chinese-sausage', name: 'กุนเชียง', price: 10, icon: '🥓' },
-        { id: 'crab-stick', name: 'ปูอัด', price: 10, icon: '🦀' },
-        { id: 'minced-pork', name: 'หมูสับ', price: 10, icon: '🥩' },
-        { id: 'chicken-feet', name: 'เล็บมือนาง', price: 10, icon: '🐓' }
-    ],
-    seafood: [
-        { id: 'raw-shrimp', name: 'กุ้งสด', price: 10, icon: '🦐' },
-        { id: 'cooked-shrimp', name: 'กุ้งสุก', price: 10, icon: '🍤' },
-        { id: 'squid', name: 'ปลาหมึก', price: 10, icon: '🐙' },
-        { id: 'cockles', name: 'หอยแครง', price: 10, icon: '🐚' },
-        { id: 'pickled-crab', name: 'ปูดอง', price: 10, icon: '🦀' }
-    ],
-    veggies: [
-        { id: 'tomato', name: 'มะเขือเทศ', price: 10, icon: '🍅' },
-        { id: 'red-onion', name: 'หอมแขก', price: 10, icon: '🧅' },
-        { id: 'culantro', name: 'ผักชีฝรั่ง', price: 10, icon: '🌱' },
-        { id: 'corn', name: 'ข้าวโพด', price: 10, icon: '🌽' },
-        { id: 'green-mango', name: 'มะม่วงเปรี้ยว', price: 10, icon: '🥭' }
-    ],
-    spicyLevels: [
-        { label: 'ไม่เผ็ด (พริก 0 เม็ด)', class: 'bg-green-100 text-green-700 hover:bg-green-200' },
-        { label: 'เผ็ดน้อย (พริก 2 เม็ด)', class: 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200' },
-        { label: 'เผ็ดกลาง (พริก 5 เม็ด)', class: 'bg-orange-100 text-orange-700 hover:bg-orange-200' },
-        { label: 'เผ็ดมาก (พริก 10 เม็ด)', class: 'bg-red-100 text-red-700 hover:bg-red-200' }
-    ],
-    sweetOptions: [
-        { label: 'รสเข้มข้นกลมกล่อม', desc: 'เปรี้ยว/หวาน/เค็ม เท่าๆกัน' },
-        { label: 'เปรี้ยวนำ (สายจี๊ดจ๊าด)', desc: 'เน้นมะนาวสดแท้สะใจ' }
-    ]
-};
+// Define updated menu structures requested by user
+const SAUCE_OPTIONS = [
+    { id: 'sauce-original', name: 'น้ำยำออริจินัล', desc: 'ครบรส หอมเปรี้ยวมะนาวสด' },
+    { id: 'sauce-plara', name: 'น้ำยำปลาร้าเลิฟเวอร์', desc: 'นัวขั้นสุด หอมกลิ่นปลาร้าเกรดพรีเมียม' },
+    { id: 'sauce-seafood', name: 'น้ำยำซีฟู้ดจี๊ดๆ', desc: 'รสแซ่บจี๊ดจ๊าด สะใจสายเผ็ดเปรี้ยว' }
+];
 
-// Firebase Initialization Setup based on Sandbox environment variables safely
+const INGREDIENTS_LIST = [
+    { id: 'lookchin-moo', name: 'ลูกชิ้นหมู', price: 7, icon: '🍢' },
+    { id: 'sausage-red', name: 'ไส้กรอกแดง(ทอด)', price: 10, icon: '🌭' },
+    { id: 'crab-stick', name: 'ปูอัด', price: 7, icon: '🦀' },
+    { id: 'pork-belly', name: 'หมูสามชั้น', price: 10, icon: '🥓' },
+    { id: 'shrimp', name: 'กุ้ง', price: 15, icon: '🦐' },
+    { id: 'moo-yor', name: 'หมูยอ', price: 10, icon: '🍥' },
+    { id: 'fish-tofu', name: 'เต้าหู้ปลา', price: 10, icon: '⏹️' },
+    { id: 'wakame-mushroom', name: 'สาหร่ายวากาเมะพันเห็ดเข็มทอง', price: 15, icon: '🍄' },
+    { id: 'sausage-normal', name: 'ไส้กรอกปกติ', price: 7, icon: '🌭' },
+    { id: 'nuggets', name: 'นักเก็ต', price: 10, icon: '🍗' },
+    { id: 'chicken-pop', name: 'ไก่ป๊อป', price: 10, icon: '🍿' },
+    { id: 'cheese-tofu', name: 'เต้าหู้ชีส', price: 10, icon: '🧀' },
+    { id: 'salted-egg', name: 'ไข่แดงเค็ม', price: 15, icon: '🍳' },
+    { id: 'wonton', name: 'เกี๊ยว', price: 10, icon: '🥟' },
+    { id: 'cheese-sausage', name: 'ไส้กรอกชีส', price: 10, icon: '🌭' }
+];
+
+const SPICY_LEVELS = [
+    { label: 'ไม่เผ็ด', desc: 'พริก 0 เม็ด' },
+    { label: 'เผ็ดน้อย', desc: 'พริก 2 เม็ด' },
+    { label: 'เผ็ดกลาง', desc: 'พริก 5 เม็ด' },
+    { label: 'เผ็ดมาก', desc: 'พริก 10 เม็ด' }
+];
+
 let db, auth;
-const appId = typeof __app_id !== 'undefined' ? __app_id : 'spicy-salad-shop-default';
+const appId = typeof __app_id !== 'undefined' ? __app_id : 'yumsing-shop-v2';
 const collectionPath = `artifacts/${appId}/public/data/orders`;
 
 async function initFirebase() {
@@ -99,322 +86,311 @@ async function initFirebase() {
   }
 }
 
+function renderInterface() {
+    // 1. Render Sauce Options (น้ำยำ)
+    const sauceContainer = document.getElementById('sauce-container');
+    if (sauceContainer) {
+        sauceContainer.innerHTML = SAUCE_OPTIONS.map(s => {
+            const isSelected = state.order.sauce === s.name;
+            return `
+                <button onclick="selectSauce('${s.name}')" class="p-4 border-2 rounded-2xl text-left transition-all duration-200 flex flex-col justify-between ${isSelected ? 'border-orange-500 bg-orange-50/50 text-orange-800 font-bold ring-2 ring-orange-500/10' : 'border-slate-100 hover:border-slate-300 bg-slate-50 text-slate-700'}">
+                    <div class="flex items-center space-x-2.5 mb-1">
+                        <span class="w-4 h-4 rounded-full border-2 flex items-center justify-center ${isSelected ? 'border-orange-500 bg-orange-500' : 'border-slate-300 bg-white'}">
+                            ${isSelected ? '<span class="w-1.5 h-1.5 rounded-full bg-white"></span>' : ''}
+                        </span>
+                        <span class="text-sm font-semibold">${s.name}</span>
+                    </div>
+                    <p class="text-[10px] text-slate-400 font-normal pl-6">${s.desc}</p>
+                </button>
+            `;
+        }).join('');
+    }
 
-async function writeOrder(orderData) {
-  const uid = auth.currentUser.uid;
-
-  await addDoc(collection(db, "orders"), {
-    ...orderData,
-    customerUid: uid,
-    status: "new",
-    createdAt: serverTimestamp()
-  });
-}
-
-// Helper function to build custom elements & attach listeners
-function renderCustomizer() {
-    // Render bases
-    const baseContainer = document.getElementById('base-container');
-    baseContainer.innerHTML = INGREDIENTS.bases.map(b => `
-        <button onclick="selectBase('${b.name}')" id="btn-base-${b.name}" class="p-3.5 border-2 rounded-xl text-center font-medium transition-all duration-200 hover:border-orange-500 hover:bg-orange-50/20 text-slate-700 ${state.order.base === b.name ? 'border-orange-500 bg-orange-50 text-orange-700 font-bold shadow-sm' : 'border-slate-200'}">
-            <span class="block text-2xl mb-1">${b.icon}</span>
-            <span class="text-xs md:text-sm">${b.name}</span>
-        </button>
-    `).join('');
-
-    // Render toppings with plus/minus quantity selectors
-    const renderAddons = (containerId, addonList) => {
-        const container = document.getElementById(containerId);
-        container.innerHTML = addonList.map(a => {
-            const currentAddon = state.order.addons.find(item => item.name === a.name);
-            const qty = currentAddon ? currentAddon.quantity : 0;
-            const isActive = qty > 0;
+    // 2. Render Topping Ingredients (เครื่องยำ)
+    const ingredientsContainer = document.getElementById('ingredients-container');
+    if (ingredientsContainer) {
+        ingredientsContainer.innerHTML = INGREDIENTS_LIST.map(item => {
+            const currentSelected = state.order.addons.find(a => a.name === item.name);
+            const qty = currentSelected ? currentSelected.quantity : 0;
+            const hasSelection = qty > 0;
 
             return `
-                <div class="p-3.5 border rounded-xl flex items-center justify-between text-left transition-all duration-200 ${isActive ? 'border-orange-400 bg-orange-50/40 text-orange-700 font-bold' : 'border-slate-200 text-slate-700'}">
-                    <div class="flex flex-col">
-                        <span class="flex items-center space-x-2 text-xs md:text-sm">
-                            <span class="text-xl">${a.icon}</span>
-                            <span>${a.name}</span>
-                        </span>
-                        <span class="text-xs text-orange-600 pl-7">+${a.price}.-</span>
+                <div class="p-3.5 border rounded-2xl flex items-center justify-between text-left transition-all duration-200 ${hasSelection ? 'border-orange-400 bg-orange-50/30 text-orange-800 font-bold' : 'border-slate-100 hover:border-slate-200 text-slate-700'}">
+                    <div class="flex items-center space-x-3">
+                        <span class="text-2xl">${item.icon}</span>
+                        <div class="flex flex-col">
+                            <span class="text-xs md:text-sm">${item.name}</span>
+                            <span class="text-[10px] text-orange-600 font-semibold">${item.price} บาท/ไม้</span>
+                        </div>
                     </div>
 
-                    <!-- Plus/Minus Controls -->
-                    <div class="flex items-center space-x-2.5">
+                    <!-- Increment Decrement Buttons -->
+                    <div class="flex items-center space-x-2">
                         ${qty > 0 ? `
-                            <button onclick="changeAddonQuantity('${a.name}', ${a.price}, -1)" class="w-7 h-7 bg-white hover:bg-slate-100 text-slate-600 border border-slate-300 rounded-full flex items-center justify-center font-bold text-sm focus:outline-none shadow-sm">
+                            <button onclick="updateAddonQty('${item.name}', ${item.price}, -1)" class="w-7 h-7 bg-white hover:bg-slate-100 text-slate-600 border border-slate-200 rounded-full flex items-center justify-center font-bold text-sm focus:outline-none shadow-sm">
                                 -
                             </button>
                             <span class="text-sm font-bold text-slate-800 w-4 text-center">${qty}</span>
                         ` : ''}
-                        <button onclick="changeAddonQuantity('${a.name}', ${a.price}, 1)" class="w-7 h-7 ${isActive ? 'bg-orange-500 hover:bg-orange-600 text-white' : 'bg-slate-100 hover:bg-slate-200 text-slate-600'} rounded-full flex items-center justify-center font-bold text-sm focus:outline-none shadow-sm">
+                        <button onclick="updateAddonQty('${item.name}', ${item.price}, 1)" class="w-7 h-7 ${hasSelection ? 'bg-orange-500 hover:bg-orange-600 text-white' : 'bg-slate-100 hover:bg-slate-200 text-slate-600'} rounded-full flex items-center justify-center font-bold text-sm focus:outline-none shadow-sm">
                             +
                         </button>
                     </div>
                 </div>
             `;
         }).join('');
-    };
+    }
 
-    renderAddons('meats-container', INGREDIENTS.meats);
-    renderAddons('seafood-container', INGREDIENTS.seafood);
-    renderAddons('veggies-container', INGREDIENTS.veggies);
-
-    // Render Spiciness Options
+    // 3. Render Spicy levels selector
     const spicyContainer = document.getElementById('spicy-container');
-    spicyContainer.innerHTML = INGREDIENTS.spicyLevels.map(s => `
-        <button onclick="selectSpiciness('${s.label}')" class="p-3 rounded-xl border text-center transition-all ${state.order.spiciness === s.label ? 'border-orange-500 bg-orange-50 text-orange-700 font-bold ring-2 ring-orange-500/20' : 'border-slate-200 text-slate-600 text-xs hover:bg-slate-50'}">
-            <span class="text-xs md:text-sm font-medium block">${s.label.split(' ')[0]}</span>
-            <span class="text-[10px] opacity-75">${s.label.split(' ')[1] || ''}</span>
-        </button>
-    `).join('');
+    if (spicyContainer) {
+        spicyContainer.innerHTML = SPICY_LEVELS.map(s => {
+            const isSelected = state.order.spiciness === s.label;
+            return `
+                <button onclick="selectSpiciness('${s.label}')" class="p-3 rounded-2xl border text-center transition-all ${isSelected ? 'border-red-500 bg-red-50 text-red-700 font-bold ring-2 ring-red-500/10' : 'border-slate-100 hover:border-slate-200 bg-slate-50 text-slate-600'}">
+                    <span class="text-xs md:text-sm block font-bold">${s.label}</span>
+                    <span class="text-[9px] opacity-75">${s.desc}</span>
+                </button>
+            `;
+        }).join('');
+    }
 
-    // Render Taste Sweet Choices
-    const sweetContainer = document.getElementById('sweet-container');
-    sweetContainer.innerHTML = INGREDIENTS.sweetOptions.map(sw => `
-        <button onclick="selectSweetPreference('${sw.label}')" class="p-3 border rounded-xl text-center transition-all ${state.order.preference === sw.label ? 'border-orange-500 bg-orange-50 text-orange-700 font-bold' : 'border-slate-200 text-slate-600 text-xs hover:bg-slate-50'}">
-            <span class="text-xs md:text-sm font-medium block">${sw.label}</span>
-            <span class="text-[10px] opacity-60 block">${sw.desc}</span>
-        </button>
-    `).join('');
-
-    updateCheckoutSummaries();
+    updatePricingCalculations();
 }
 
-window.selectBase = function(baseName) {
-    state.order.base = baseName;
-    renderCustomizer();
+window.selectSauce = function(sauceName) {
+    state.order.sauce = sauceName;
+    renderInterface();
 };
 
-// Handle Addon quantity increments or decrements
-window.changeAddonQuantity = function(addonName, price, change) {
-    const index = state.order.addons.findIndex(a => a.name === addonName);
-    if (index > -1) {
-        const item = state.order.addons[index];
-        item.quantity += change;
-        if (item.quantity <= 0) {
-            state.order.addons.splice(index, 1);
+window.updateAddonQty = function(addonName, price, delta) {
+    const foundIndex = state.order.addons.findIndex(a => a.name === addonName);
+    if (foundIndex > -1) {
+        const addon = state.order.addons[foundIndex];
+        addon.quantity += delta;
+        if (addon.quantity <= 0) {
+            state.order.addons.splice(foundIndex, 1);
         }
-    } else if (change > 0) {
+    } else if (delta > 0) {
         state.order.addons.push({ name: addonName, price: price, quantity: 1 });
     }
-    renderCustomizer();
+    renderInterface();
 };
 
-window.selectSpiciness = function(spicyLabel) {
-    state.order.spiciness = spicyLabel;
-    renderCustomizer();
-};
-
-window.selectSweetPreference = function(sweetLabel) {
-    state.order.preference = sweetLabel;
-    renderCustomizer();
+window.selectSpiciness = function(spicyLevel) {
+    state.order.spiciness = spicyLevel;
+    renderInterface();
 };
 
 window.resetSaladState = function() {
-    state.order.base = 'ไหลบัว';
     state.order.addons = [];
     state.order.spiciness = 'เผ็ดกลาง';
-    state.order.preference = 'รสเข้มข้นกลมกล่อม';
-    renderCustomizer();
-    showToast('🔄 ล้างข้อมูลปรุงยำเรียบร้อยแล้ว');
+    renderInterface();
+    showToast('🔄 รีเซ็ตค่าเริ่มต้นเครื่องยำเรียบร้อยแล้ว');
 };
 
-function updateCheckoutSummaries() {
-    // Price formulation logic with quantities
-    const basePrice = 40; // Flat fee for sauce and chosen base
-    const addonsPrice = state.order.addons.reduce((acc, curr) => acc + (curr.price * curr.quantity), 0);
-    const totalAddonsCount = state.order.addons.reduce((acc, curr) => acc + curr.quantity, 0);
-    const deliveryPrice = state.order.type === 'delivery' ? 40 : 0;
+window.selectDormLocation = function(locationName) {
+    state.order.dormLocation = locationName;
+    const btnFemale = document.getElementById('btn-dorm-female1');
+    const btnMale = document.getElementById('btn-dorm-male4');
 
-    const total = basePrice + addonsPrice + deliveryPrice;
-    state.order.totalPrice = total;
-
-    // DOM updates
-    document.getElementById('cart-summary-price').innerText = total;
-    document.getElementById('cart-grand-total').innerText = total;
-    document.getElementById('payment-price-display').innerText = total;
-
-    // Labels on receipt panel
-    document.getElementById('addon-count-label').innerText = `เครื่องยำเพิ่มเติม (${totalAddonsCount} ชิ้น)`;
-    document.getElementById('addon-price-label').innerText = `${addonsPrice} บาท`;
-    document.getElementById('delivery-price-label').innerText = `${deliveryPrice} บาท`;
-
-    // Draw cart list dynamically on receipt panel
-    const cartList = document.getElementById('cart-list');
-    let cartHTML = `
-        <div class="flex justify-between items-center bg-orange-50/50 p-2 rounded-lg mb-2">
-            <span class="font-medium text-orange-800">🥗 ยำ${state.order.base}</span>
-            <span class="text-slate-500 font-medium">40.-</span>
-        </div>
-    `;
-
-    if (state.order.addons.length > 0) {
-        cartHTML += state.order.addons.map(a => `
-            <div class="flex justify-between items-center text-xs pl-3 py-1">
-                <span class="text-slate-600">
-                    <i class="fa-solid fa-plus text-orange-400 mr-1.5 text-[9px]"></i>
-                    ${a.name} <span class="text-orange-600 font-bold">x${a.quantity}</span>
-                </span>
-                <span class="text-slate-400">+${a.price * a.quantity}.-</span>
-            </div>
-        `).join('');
+    if (locationName === 'หอหญิง 1') {
+        if (btnFemale) btnFemale.className = "p-4 border-2 rounded-2xl text-center font-bold transition-all duration-200 border-orange-500 bg-orange-50 text-orange-800 ring-2 ring-orange-500/15";
+        if (btnMale) btnMale.className = "p-4 border-2 rounded-2xl text-center font-bold transition-all duration-200 border-slate-200 hover:border-slate-300 text-slate-700 bg-slate-50/50";
     } else {
-        cartHTML += `<p class="text-xs text-slate-400 pl-3 py-1">ไม่มีเครื่องเพิ่มเติม</p>`;
+        if (btnMale) btnMale.className = "p-4 border-2 rounded-2xl text-center font-bold transition-all duration-200 border-orange-500 bg-orange-50 text-orange-800 ring-2 ring-orange-500/15";
+        if (btnFemale) btnFemale.className = "p-4 border-2 rounded-2xl text-center font-bold transition-all duration-200 border-slate-200 hover:border-slate-300 text-slate-700 bg-slate-50/50";
+    }
+};
+
+function updatePricingCalculations() {
+    // No base price. Price of food relies on sticks/addons sum.
+    const addonsSum = state.order.addons.reduce((acc, curr) => acc + (curr.price * curr.quantity), 0);
+    const deliveryFee = 10; // Fixed delivery fee 10 baht
+
+    const grandTotal = addonsSum + deliveryFee;
+    state.order.totalPrice = grandTotal;
+
+    // DOM Updates safely
+    const cartSummaryPrice = document.getElementById('cart-summary-price');
+    if (cartSummaryPrice) cartSummaryPrice.innerText = addonsSum;
+
+    const cartGrandTotal = document.getElementById('cart-grand-total');
+    if (cartGrandTotal) cartGrandTotal.innerText = grandTotal;
+
+    const paymentPriceDisplay = document.getElementById('payment-price-display');
+    if (paymentPriceDisplay) paymentPriceDisplay.innerText = grandTotal;
+
+    const addonPriceLabel = document.getElementById('addon-price-label');
+    if (addonPriceLabel) addonPriceLabel.innerText = `${addonsSum} บาท`;
+
+    const deliveryPriceLabel = document.getElementById('delivery-price-label');
+    if (deliveryPriceLabel) deliveryPriceLabel.innerText = `${deliveryFee} บาท`;
+
+    // Dynamic Receipt Render on step 2
+    const receiptSauce = document.getElementById('receipt-sauce');
+    if (receiptSauce) {
+        receiptSauce.innerHTML = `
+            <div class="flex justify-between items-center text-xs">
+                <span class="font-bold text-orange-800">🍯 ${state.order.sauce}</span>
+                <span class="text-green-600 font-extrabold text-[10px] bg-green-50 px-2 py-0.5 rounded-full">ฟรีค่าน้ำยำ</span>
+            </div>
+            <div class="mt-1 flex flex-wrap gap-1">
+                <span class="text-[9px] bg-red-50 text-red-700 px-1.5 py-0.5 rounded-md font-bold">🌶️ ความเผ็ด: ${state.order.spiciness}</span>
+            </div>
+        `;
     }
 
-    // Flavor tags representation (Removed Anchovy tag)
-    cartHTML += `
-        <div class="mt-3 pt-3 border-t border-slate-100 flex flex-wrap gap-1">
-            <span class="text-[10px] bg-red-50 text-red-600 px-2 py-0.5 rounded-full font-medium">🌶️ ${state.order.spiciness.split(' ')[0]}</span>
-            <span class="text-[10px] bg-purple-50 text-purple-600 px-2 py-0.5 rounded-full font-medium">🍋 ${state.order.preference.split(' ')[0]}</span>
-        </div>
-    `;
-    cartList.innerHTML = cartHTML;
+    const cartList = document.getElementById('cart-list');
+    if (cartList) {
+        if (state.order.addons.length > 0) {
+            cartList.innerHTML = state.order.addons.map(a => `
+                <div class="flex justify-between items-center text-xs">
+                    <span class="text-slate-600">
+                        <i class="fa-solid fa-plus text-orange-400 mr-1.5 text-[8px]"></i>
+                        ${a.name} <span class="text-orange-600 font-bold">x${a.quantity}</span>
+                    </span>
+                    <span class="text-slate-400 font-medium">${a.price * a.quantity}.-</span>
+                </div>
+            `).join('');
+        } else {
+            cartList.innerHTML = `<p class="text-[11px] text-slate-400 italic text-center py-2">ยังไม่ได้เลือกเครื่องยำเพิ่มเติม</p>`;
+        }
+    }
 }
 
-// Handle Delivery Delivery/Pickup Radio choices
-window.toggleOrderType = function(type) {
-    state.order.type = type;
-    const deliveryLabel = document.getElementById('label-type-delivery');
-    const pickupLabel = document.getElementById('label-type-pickup');
-    const addressBox = document.getElementById('delivery-address-box');
+window.goToStep = function(targetStep) {
+    if (targetStep === 2) {
+        // Validation: Must select at least one ingredient to proceed
+        if (state.order.addons.length === 0) {
+            showToast('⚠️ กรุณาเลือกเครื่องยำอย่างน้อย 1 รายการก่อนดำเนินการต่อค่ะ', 'error');
+            return;
+        }
 
-    if (type === 'delivery') {
-        deliveryLabel.className = "border-2 border-orange-500 bg-orange-50/50 rounded-xl p-3.5 flex items-center space-x-3 cursor-pointer text-orange-700 font-medium transition-all";
-        pickupLabel.className = "border border-slate-200 rounded-xl p-3.5 flex items-center space-x-3 cursor-pointer text-slate-600 font-medium transition-all";
-        addressBox.classList.remove('hidden');
-    } else {
-        pickupLabel.className = "border-2 border-orange-500 bg-orange-50/50 rounded-xl p-3.5 flex items-center space-x-3 cursor-pointer text-orange-700 font-medium transition-all";
-        deliveryLabel.className = "border border-slate-200 rounded-xl p-3.5 flex items-center space-x-3 cursor-pointer text-slate-600 font-medium transition-all";
-        addressBox.classList.add('hidden');
-    }
-    updateCheckoutSummaries();
-};
-
-window.goToStep = function(stepNum) {
-    // Validation before moving to steps
-    if (stepNum === 2) {
-        // Moving from step 1 to 2
+        // Display Step 2
         document.getElementById('customer-step-1').classList.add('hidden');
         document.getElementById('customer-step-2').classList.remove('hidden');
         document.getElementById('customer-step-3').classList.add('hidden');
-        updateStepIndicator(2, "ข้อมูลจัดส่งและการรับอาหาร");
+        
+        // Update Indicator
+        const indicator = document.getElementById('step-indicator');
+        if (indicator) {
+            indicator.innerHTML = `
+                <span class="w-8 h-8 rounded-full bg-orange-500 text-white flex items-center justify-center text-sm font-bold animate-pulse">2</span>
+                <span>ข้อมูลจัดส่งและการรับอาหาร</span>
+            `;
+        }
+        
         state.currentStep = 2;
         window.scrollTo({ top: 0, behavior: 'smooth' });
-    } else if (stepNum === 3) {
-        // Moving from step 2 to 3 (Requires validation of inputs!)
-        const name = document.getElementById('cust-name').value.trim();
-        const phone = document.getElementById('cust-phone').value.trim();
-        const address = document.getElementById('cust-address').value.trim();
-        const time = document.getElementById('cust-time').value.trim();
+    } else if (targetStep === 3) {
+        // Validation: Verify details
+        const nameVal = document.getElementById('cust-name').value.trim();
+        const phoneVal = document.getElementById('cust-phone').value.trim();
 
-        if (!name) {
-            showToast('⚠️ กรุณากรอกชื่อผู้สั่งอาหาร', 'error');
+        if (!state.order.dormLocation) {
+            showToast('⚠️ กรุณาเลือกหอพักจัดส่ง (หอหญิง 1 หรือ หอชาย 4)', 'error');
             return;
         }
-        if (!phone || phone.length < 9) {
-            showToast('⚠️ กรุณากรอกเบอร์โทรศัพท์ที่ติดต่อได้จริง', 'error');
+        if (!nameVal) {
+            showToast('⚠️ กรุณาระบุชื่อผู้สั่งซื้ออาหาร', 'error');
             return;
         }
-        if (state.order.type === 'delivery' && !address) {
-            showToast('⚠️ กรุณากรอกที่อยู่จัดส่ง', 'error');
-            return;
-        }
-        if (!time) {
-            showToast('⚠️ กรุณาระบุเวลาที่สะดวกรับอาหาร', 'error');
+        if (!phoneVal || phoneVal.length < 9) {
+            showToast('⚠️ กรุณาระบุเบอร์โทรศัพท์ที่ติดต่อได้ถูกต้อง', 'error');
             return;
         }
 
-        // Save to state
-        state.order.custName = name;
-        state.order.custPhone = phone;
-        state.order.address = state.order.type === 'delivery' ? address : 'รับเองที่หน้าร้าน';
-        state.order.time = time;
+        // Commit fields to state
+        state.order.custName = nameVal;
+        state.order.custPhone = phoneVal;
         state.order.note = document.getElementById('cust-note').value.trim();
 
-        // Move to Step 3
+        // Render Step 3
         document.getElementById('customer-step-1').classList.add('hidden');
         document.getElementById('customer-step-2').classList.add('hidden');
         document.getElementById('customer-step-3').classList.remove('hidden');
-        updateStepIndicator(3, "ชำระเงินและส่งหลักฐานโอน");
-        state.currentStep = 3;
 
-        // Load Dynamic PromptPay QR Code
+        const indicator = document.getElementById('step-indicator');
+        if (indicator) {
+            indicator.innerHTML = `
+                <span class="w-8 h-8 rounded-full bg-orange-500 text-white flex items-center justify-center text-sm font-bold animate-pulse">3</span>
+                <span>ชำระเงินและแจ้งโอน</span>
+            `;
+        }
+
+        state.currentStep = 3;
         generatePromptPayQR();
         window.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
-        // Going back to step 1
+        // Back to Step 1
         document.getElementById('customer-step-1').classList.remove('hidden');
         document.getElementById('customer-step-2').classList.add('hidden');
         document.getElementById('customer-step-3').classList.add('hidden');
-        updateStepIndicator(1, "เลือกวัตถุดิบและสไตล์ยำ");
+
+        const indicator = document.getElementById('step-indicator');
+        if (indicator) {
+            indicator.innerHTML = `
+                <span class="w-8 h-8 rounded-full bg-orange-500 text-white flex items-center justify-center text-sm font-bold animate-pulse">1</span>
+                <span>เลือกวัตถุดิบและสไตล์ยำ</span>
+            `;
+        }
+
         state.currentStep = 1;
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 };
 
-function updateStepIndicator(num, text) {
-    const ind = document.getElementById('step-indicator');
-    ind.innerHTML = `
-        <span class="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center text-sm font-bold animate-bounce">${num}</span>
-        <span>${text}</span>
-    `;
-}
-
 function generatePromptPayQR() {
     const qrImg = document.getElementById('qr-code-img');
     const qrLoading = document.getElementById('qr-loading');
 
-    qrLoading.classList.remove('hidden');
+    if (qrLoading) qrLoading.classList.remove('hidden');
 
-    // Format phone number or taxId for PromptPay
-    // promptpay.io API consumes string amounts perfectly
     const formattedPP = state.promptPayNumber.replace(/-/g, '').trim();
     const amount = state.order.totalPrice;
 
-    // Set source with loading wrapper fallback
-    qrImg.src = `https://promptpay.io/${formattedPP}/${amount}.png`;
+    if (qrImg) {
+        qrImg.src = `/img/QRCODE.jpg`;
 
-    qrImg.onload = () => {
-        qrLoading.classList.add('hidden');
-    };
-
-    qrImg.onerror = () => {
-        qrLoading.innerHTML = `
-            <i class="fa-solid fa-triangle-exclamation text-red-500 text-xl"></i>
-            <span class="text-[10px] text-red-500">โหลด QR ผิดพลาด</span>
-        `;
-    };
+        qrImg.onload = () => {
+            if (qrLoading) qrLoading.classList.add('hidden');
+        };
+        qrImg.onerror = () => {
+            if (qrLoading) {
+                qrLoading.innerHTML = `
+                    <i class="fa-solid fa-triangle-exclamation text-rose-500 text-xl"></i>
+                    <span class="text-[9px] text-rose-500">คิวอาร์โหลดล้มเหลว</span>
+                `;
+            }
+        };
+    }
 }
 
-// Dedicated helper function to trigger the hidden file selector
 window.triggerFileInput = function() {
-    document.getElementById('slip-input').click();
+    const slipInput = document.getElementById('slip-input');
+    if (slipInput) slipInput.click();
 };
 
 window.handleSlipUpload = function(event) {
     const file = event.target.files[0];
     if (!file) return;
 
-    // Filter image types
     if (!file.type.startsWith('image/')) {
-        showToast('⚠️ รองรับเฉพาะไฟล์รูปภาพหลักฐานสลิปเท่านั้น', 'error');
+        showToast('⚠️ รองรับเฉพาะรูปถ่ายสลิปโอนเงินเท่านั้นค่ะ', 'error');
         return;
     }
 
-    // Client side image compression using Canvas to fit Firestore limits (Strict doc limits)
     const reader = new FileReader();
     reader.readAsDataURL(file);
     reader.onload = function(e) {
         const img = new Image();
         img.src = e.target.result;
         img.onload = function() {
+            // Compress image file to preserve fast Firestore payloads limit
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
 
-            // Constrain maximum image boundaries to minimize payload sizes
             const MAX_WIDTH = 500;
             const MAX_HEIGHT = 800;
             let width = img.width;
@@ -436,17 +412,23 @@ window.handleSlipUpload = function(event) {
             canvas.height = height;
             ctx.drawImage(img, 0, 0, width, height);
 
-            // Export image quality compressed Base64
             const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
             state.order.slipBase64 = dataUrl;
 
-            // Render upload container UI changes
-            document.getElementById('upload-placeholder').classList.add('hidden');
-            document.getElementById('upload-preview-container').classList.remove('hidden');
-            document.getElementById('upload-preview-img').src = dataUrl;
-            document.getElementById('btn-clear-slip').classList.remove('hidden'); // Show separate clear button
+            // UI adjustments
+            const placeholder = document.getElementById('upload-placeholder');
+            if (placeholder) placeholder.classList.add('hidden');
 
-            showToast('✅ แนบหลักฐานสลิปโอนเงินสำเร็จ!');
+            const previewContainer = document.getElementById('upload-preview-container');
+            if (previewContainer) previewContainer.classList.remove('hidden');
+
+            const previewImg = document.getElementById('upload-preview-img');
+            if (previewImg) previewImg.src = dataUrl;
+
+            const clearBtn = document.getElementById('btn-clear-slip');
+            if (clearBtn) clearBtn.classList.remove('hidden');
+
+            showToast('✅ แนบหลักฐานสลิปโอนเงินสำเร็จแล้วค่ะ!');
         };
     };
 };
@@ -457,147 +439,161 @@ window.clearUploadedSlip = function(e) {
         e.stopPropagation();
     }
     state.order.slipBase64 = '';
-    document.getElementById('slip-input').value = '';
-    document.getElementById('upload-placeholder').classList.remove('hidden');
-    document.getElementById('upload-preview-container').classList.add('hidden');
-    document.getElementById('upload-preview-img').src = '';
-    document.getElementById('btn-clear-slip').classList.add('hidden'); // Hide separate clear button
-    showToast('🗑️ ลบสลิปออกเรียบร้อย');
+    const slipInput = document.getElementById('slip-input');
+    if (slipInput) slipInput.value = '';
+
+    const placeholder = document.getElementById('upload-placeholder');
+    if (placeholder) placeholder.classList.remove('hidden');
+
+    const previewContainer = document.getElementById('upload-preview-container');
+    if (previewContainer) previewContainer.classList.add('hidden');
+
+    const previewImg = document.getElementById('upload-preview-img');
+    if (previewImg) previewImg.src = '';
+
+    const clearBtn = document.getElementById('btn-clear-slip');
+    if (clearBtn) clearBtn.classList.add('hidden');
+
+    showToast('🗑️ นำไฟล์สลิปออกเรียบร้อย');
 };
 
 window.submitFinalOrder = async function() {
-    // Validation slip attached check
     if (!state.order.slipBase64) {
-        showToast('⚠️ กรุณาอัปโหลดรูปสลิปหลักฐานโอนเงินก่อนส่งออเดอร์', 'error');
+        showToast('⚠️ กรุณาอัปโหลดรูปภาพสลิปแจ้งโอนเงินเพื่อยืนยันออเดอร์ค่ะ', 'error');
         return;
     }
 
     const btn = document.getElementById('btn-submit-order');
     const btnText = document.getElementById('btn-submit-text');
-    btn.disabled = true;
-    btnText.innerText = "กำลังส่งออเดอร์...";
+    if (btn) btn.disabled = true;
+    if (btnText) btnText.innerText = "กำลังส่งออเดอร์...";
 
-    const uniqueId = 'YUM-' + Date.now().toString().slice(-6) + '-' + Math.floor(Math.random() * 100);
+    const uniqueId = 'YUM-' + Date.now().toString().slice(-5) + '-' + Math.floor(Math.random() * 100);
 
     const orderPayload = {
         orderId: uniqueId,
         customerName: state.order.custName,
         phone: state.order.custPhone,
-        type: state.order.type,
-        address: state.order.address,
-        pickupTime: state.order.time,
+        dormLocation: state.order.dormLocation,
         note: state.order.note || 'ไม่มี',
-        base: state.order.base,
-        // Include quantity info inside the addons list
+        sauce: state.order.sauce,
         addons: state.order.addons.map(a => `${a.name} (x${a.quantity})`),
         spiciness: state.order.spiciness,
-        preference: state.order.preference,
         totalPrice: state.order.totalPrice,
         slipBase64: state.order.slipBase64,
-        status: 'pending', // pending, preparing, ready, completed, cancelled
+        status: 'pending',
         createdAt: new Date().toISOString(),
-        customerUid: auth.currentUser.uid
+        customerUid: auth?.currentUser?.uid || 'anonymous-user'
     };
 
     try {
         if (db) {
-            // Firebase Firestore Write logic (Strict Rule 1 paths)
-            const documentRef = doc(db, collectionPath, uniqueId);
-            await setDoc(documentRef, orderPayload);
+            // Write to Firebase following Rule 1 strict paths
+            const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'orders', uniqueId);
+            await setDoc(docRef, orderPayload);
         } else {
-            // Fallback storage if running purely offline
-            const offlineCollection = JSON.parse(localStorage.getItem('yum_mock_orders') || '[]');
-            offlineCollection.push(orderPayload);
-            localStorage.setItem('yum_mock_orders', JSON.stringify(offlineCollection));
+            // Offline simulation fallback
+            const offlineDB = JSON.parse(localStorage.getItem('yumsing_orders_fallback') || '[]');
+            offlineDB.push(orderPayload);
+            localStorage.setItem('yumsing_orders_fallback', JSON.stringify(offlineDB));
         }
 
-        // Render success confirmation dialog overlay
-        showOrderSuccessModal(uniqueId);
+        renderReceiptModal(uniqueId);
 
-        // Clear state
+        // State Resetting
         state.order.addons = [];
         state.order.slipBase64 = '';
-        document.getElementById('slip-input').value = '';
-        document.getElementById('cust-name').value = '';
-        document.getElementById('cust-phone').value = '';
-        document.getElementById('cust-address').value = '';
-        document.getElementById('cust-time').value = '';
-        document.getElementById('cust-note').value = '';
-        document.getElementById('upload-placeholder').classList.remove('hidden');
-        document.getElementById('upload-preview-container').classList.add('hidden');
-        document.getElementById('btn-clear-slip').classList.add('hidden'); // Reset separate button status
+        
+        const slipInput = document.getElementById('slip-input');
+        if (slipInput) slipInput.value = '';
 
-        goToStep(1); // Back to first step
+        const custName = document.getElementById('cust-name');
+        if (custName) custName.value = '';
+
+        const custPhone = document.getElementById('cust-phone');
+        if (custPhone) custPhone.value = '';
+
+        const custNote = document.getElementById('cust-note');
+        if (custNote) custNote.value = '';
+
+        const placeholder = document.getElementById('upload-placeholder');
+        if (placeholder) placeholder.classList.remove('hidden');
+
+        const previewContainer = document.getElementById('upload-preview-container');
+        if (previewContainer) previewContainer.classList.add('hidden');
+
+        const clearBtn = document.getElementById('btn-clear-slip');
+        if (clearBtn) clearBtn.classList.add('hidden');
+
+        goToStep(1);
     } catch (err) {
-        console.error("Failed writing order to DB", err);
-        showToast('❌ มีบางอย่างผิดพลาด กรุณาลองใหม่อีกครั้ง', 'error');
+        console.error("Order writing transaction failed", err);
+        showToast('❌ ส่งออเดอร์ล้มเหลว กรุณาลองตรวจสอบสลิปแล้วกดส่งใหม่อีกครั้ง', 'error');
     } finally {
-        btn.disabled = false;
-        btnText.innerText = "ยืนยันการสั่งซื้อ";
+        if (btn) btn.disabled = false;
+        if (btnText) btnText.innerText = "ส่งรายการออเดอร์อาหาร";
     }
 };
 
-function showOrderSuccessModal(orderId) {
-    // Beautiful full-screen receipt overlays instead of standard window.alerts (Strict restriction)
+function renderReceiptModal(orderId) {
     const overlay = document.createElement('div');
-    overlay.className = "fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4";
+    overlay.className = "fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4";
     overlay.innerHTML = `
         <div class="bg-white rounded-3xl p-6 max-w-sm w-full text-center shadow-2xl border border-orange-100 transform transition-all duration-300 scale-100 animate-[fadeIn_0.2s_ease-out]">
-            <div class="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
-                <i class="fa-solid fa-circle-check"></i>
+            <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
+                <i class="fa-solid fa-check-double animate-bounce"></i>
             </div>
-            <h3 class="text-xl font-bold text-slate-800 font-brand">สั่งยำรสจัดจ้านสำเร็จแล้ว!</h3>
-            <p class="text-xs text-slate-400 mt-1 mb-4">รหัสออเดอร์: <span class="font-bold text-slate-700 font-mono">${orderId}</span></p>
+            
+            <h3 class="text-xl font-bold text-slate-800">ส่งรายการออเดอร์เสร็จสิ้น!</h3>
+            <p class="text-xs text-slate-400 mt-1 mb-4">รหัสของคุณ: <span class="font-extrabold text-orange-600 font-mono">${orderId}</span></p>
 
-            <div class="bg-orange-50/50 rounded-xl p-3 text-left text-xs text-slate-600 space-y-2 mb-4">
-                <p class="font-medium text-slate-700">📌 ขั้นตอนถัดไปสำหรับร้าน:</p>
-                <p>1. ทางร้านกำลังตรวจสอบสลิปยอดชำระของคุณ</p>
-                <p>2. ครัวเริ่มสลัดยำสดๆ เมื่อตรวจสอบครบถ้วน</p>
-                <p>3. เมนูแซ่บจัดส่งหรือรอให้ท่านมารับตามเวลาที่นัดหมาย</p>
+            <div class="bg-gradient-to-r from-orange-50/50 to-amber-50/50 rounded-2xl p-4 text-left text-xs text-slate-600 space-y-2.5 mb-5 border border-orange-100/30">
+                <p class="font-bold text-slate-800 flex items-center"><i class="fa-solid fa-circle-info text-orange-500 mr-1.5"></i> ขั้นตอนต่อไปสำหรับคุณ:</p>
+                <p>1. ทางร้านกำลังตรวจสอบรายการสลิปชำระเงินของคุณ</p>
+                <p>2. จัดทำยำสดๆ เตรียมส่งตรงเวลา</p>
+                <p class="font-bold text-rose-600">3. รอรับยำแสนอร่อยได้ที่ใต้หอพักในช่วงเวลา 17.00 - 17.30 น.</p>
+                <div class="pt-2 border-t border-slate-200 flex flex-col space-y-1">
+                    <span>📢 อย่าลืมกดติดตาม Story IG ร้าน เพื่อดูแจ้งเตือนสถานะเมื่อยำพร้อมส่ง!</span>
+                    <a href="https://www.instagram.com/yumsing.mhosab/" target="_blank" class="text-orange-600 font-bold underline hover:text-orange-700 flex items-center">
+                        <i class="fa-brands fa-instagram mr-1"></i> @yumsing.mhosab
+                    </a>
+                </div>
             </div>
 
-            <button onclick="this.closest('.fixed').remove()" class="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white font-semibold py-2.5 rounded-xl shadow-md hover:from-orange-600 hover:to-red-600 transition-colors">
-                รับทราบ ปิดหน้านี้
+            <button onclick="this.closest('.fixed').remove()" class="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold py-3.5 rounded-2xl shadow-md hover:from-orange-600 hover:to-red-600 transition-colors">
+                รับทราบและตกลง
             </button>
         </div>
     `;
     document.body.appendChild(overlay);
 }
 
-// Custom high quality system toast notifications
 function showToast(message, type = 'success') {
     const container = document.getElementById('toast-container');
+    if (!container) return;
+    
     const toast = document.createElement('div');
-
     const bgClass = type === 'success'
-        ? 'bg-slate-900/95 border-l-4 border-emerald-500 text-emerald-400'
-        : 'bg-red-950/95 border-l-4 border-red-500 text-red-400';
+        ? 'bg-slate-900 border-l-4 border-emerald-500 text-emerald-400'
+        : 'bg-rose-950 border-l-4 border-rose-500 text-rose-400';
 
-    toast.className = `p-4 rounded-xl shadow-xl flex items-center space-x-3 pointer-events-auto transition-all duration-300 transform translate-x-12 opacity-0 text-xs md:text-sm ${bgClass}`;
-    toast.innerHTML = `
-        <div>
-            <span class="font-medium text-white">${message}</span>
-        </div>
-    `;
+    toast.className = `p-4 rounded-2xl shadow-2xl flex items-center space-x-3 pointer-events-auto transition-all duration-300 transform translate-x-12 opacity-0 text-xs md:text-sm ${bgClass}`;
+    toast.innerHTML = `<span class="font-bold text-white">${message}</span>`;
 
     container.appendChild(toast);
 
-    // Trigger animation in
     setTimeout(() => {
         toast.classList.remove('translate-x-12', 'opacity-0');
-    }, 10);
+    }, 15);
 
-    // Trigger animation out and destroy
     setTimeout(() => {
         toast.classList.add('translate-x-12', 'opacity-0');
-        setTimeout(() => {
-            toast.remove();
-        }, 300);
-    }, 4000);
+        setTimeout(() => toast.remove(), 300);
+    }, 4500);
 }
 
-// Window Onload Trigger (Strict requirement)
+// Window Loading Event
 window.onload = async function() {
     await initFirebase();
-    renderCustomizer();
+    renderInterface();
 };

@@ -1,331 +1,357 @@
 <!DOCTYPE html>
-<html lang="th">
+<html lang="th" class="h-full bg-slate-50">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ยำเด็ดเจ็ดย่านน้ำ - สั่งยำออนไลน์</title>
+    <title>ยำเด็ด7ย่านน้ำ - ระบบสั่งยำออนไลน์</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts: Prompt & Sriracha for local look -->
+    <!-- Google Fonts Inter & Prompt -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Sriracha&display=swap" rel="stylesheet">
-
-    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body {
+            font-family: 'Prompt', 'Inter', sans-serif;
+        }
+    </style>
 </head>
-<body class="text-slate-800 min-h-screen flex flex-col">
+<body class="h-full text-slate-800 antialiased">
 
-    <!-- Top Navbar -->
-    <header class="bg-gradient-to-r from-red-500 via-orange-500 to-yellow-500 text-white shadow-md sticky top-0 z-50">
-        <div class="max-w-6xl mx-auto px-4 py-3 flex items-center">
-            <div class="flex items-center space-x-2">
-                <span class="text-3xl">🌶️</span>
-                <span class="text-2xl font-brand font-bold tracking-wider">ยำเด็ดเจ็ดย่านน้ำ ออนไลน์</span>
+<div class="min-h-screen flex flex-col pb-24 md:pb-8">
+    <!-- Top Decorative Banner -->
+    <header class="bg-gradient-to-r from-rose-600 via-orange-500 to-amber-500 text-white shadow-md relative overflow-hidden">
+        <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.15),transparent)]"></div>
+        <div class="max-w-4xl mx-auto px-4 py-6 md:py-8 flex flex-col md:flex-row items-center justify-between relative z-10 gap-4">
+            <div class="text-center md:text-left">
+                <div class="inline-flex items-center space-x-2 bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-xs font-semibold tracking-wider uppercase mb-2">
+                    <span class="flex h-2 w-2 relative">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                    </span>
+                    <span>ครัวเปิดบริการแล้ว</span>
+                </div>
+                <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight">ยำเด็ด7ย่านน้ำ <span class="text-yellow-300">🌶️</span></h1>
+                <p class="text-xs md:text-sm text-orange-100 mt-1 font-medium">ยำรสจัดจ้าน เครื่องแน่น จัดเต็มทุกไม้ ส่งตรงถึงหอพักคุณ</p>
+            </div>
+            
+            <div class="flex items-center space-x-3 bg-black/10 backdrop-blur-md px-4 py-2.5 rounded-2xl border border-white/10">
+                <i class="fa-brands fa-instagram text-2xl text-pink-300"></i>
+                <div class="text-left">
+                    <p class="text-[10px] text-orange-100 uppercase font-semibold">อัปเดตสถานะที่</p>
+                    <a href="https://www.instagram.com/yumsing.mhosab/" target="_blank" class="text-xs font-bold hover:underline text-white flex items-center">
+                        @yumsing.mhosab <i class="fa-solid fa-arrow-up-right-from-square ml-1 text-[9px]"></i>
+                    </a>
+                </div>
             </div>
         </div>
     </header>
 
-    <!-- Custom Notification Toast Container -->
-    <div id="toast-container" class="fixed top-20 right-4 z-50 flex flex-col space-y-2 pointer-events-none max-w-sm w-full"></div>
-
-    <!-- Main Content Grid -->
-    <main class="flex-grow max-w-6xl mx-auto w-full px-4 py-6">
-
-        <!-- CUSTOMER VIEW -->
-        <div id="customer-view" class="space-y-6">
-            <!-- Hero banner -->
-            <div class="bg-gradient-to-br from-red-500 to-orange-600 text-white rounded-3xl p-6 md:p-8 shadow-xl relative overflow-hidden">
-                <div class="absolute right-0 bottom-0 opacity-10 pointer-events-none">
-                    <i class="fa-solid fa-pepper-hot text-[15rem]"></i>
-                </div>
-                <div class="relative z-10 max-w-lg">
-                    <span class="bg-yellow-400 text-red-900 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">เปิดเตาพร้อมแซ่บ</span>
-                    <h1 class="text-3xl md:text-4xl font-brand font-bold mt-3 mb-2">ยำตามใจคุณ เริ่มต้นเพียง 40.-</h1>
-                    <p class="text-sm md:text-base text-white/90 leading-relaxed">เลือกวัตถุดิบและท็อปปิ้งได้เองตามใจชอบ มิกซ์แอนด์แมทช์ตามความนัวที่คุณต้องการ ยิ่งเลือกเยอะยิ่งสะใจ!</p>
-                </div>
+    <!-- Main Order Portal -->
+    <main class="max-w-4xl w-full mx-auto px-4 py-6 flex-grow">
+        <!-- Step Navigation Bar -->
+        <div class="bg-white rounded-2xl p-3 shadow-sm border border-slate-100 flex items-center justify-between mb-6">
+            <div id="step-indicator" class="flex items-center space-x-2.5 text-slate-800 font-bold text-sm md:text-base">
+                <span class="w-8 h-8 rounded-full bg-orange-500 text-white flex items-center justify-center text-sm font-bold animate-pulse">1</span>
+                <span>เลือกวัตถุดิบและสไตล์ยำ</span>
             </div>
-
-            <!-- Ordering System Stepper UI -->
-            <div class="bg-white rounded-2xl p-4 shadow-sm border border-orange-100 flex justify-between items-center">
-                <div class="flex items-center space-x-2 text-orange-600 font-semibold" id="step-indicator">
-                    <span class="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center text-sm font-bold">1</span>
-                    <span>เลือกวัตถุดิบและสไตล์ยำ</span>
-                </div>
-                <div class="text-slate-400 text-xs md:text-sm">
-                    ยอดรวมปัจจุบัน: <span class="text-red-500 font-bold text-lg" id="cart-summary-price">40</span> บาท
-                </div>
+            <div class="text-xs text-slate-400 font-medium">
+                ร้านยำเด็ด7ย่านน้ำ
             </div>
+        </div>
 
-            <!-- Steps Content Wrapper -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- Left & Middle: Order Customizer/Forms -->
-                <div class="lg:col-span-2 space-y-6">
+        <!-- STEP 1: Ingredient and Flavor Selection -->
+        <div id="customer-step-1" class="space-y-6">
+            
+            <!-- SECTION 1: Choose Sauce (น้ำยำ) -->
+            <section class="bg-white rounded-3xl p-5 md:p-6 shadow-sm border border-slate-100">
+                <div class="flex items-center space-x-2.5 mb-4 border-b border-slate-50 pb-3">
+                    <span class="text-2xl">🍯</span>
+                    <div>
+                        <h2 class="text-base md:text-lg font-bold text-slate-800">1. เลือกน้ำยำสุดนัว <span class="text-emerald-500 text-xs font-semibold bg-emerald-50 px-2 py-0.5 rounded-full ml-1">ฟรี!</span></h2>
+                        <p class="text-[11px] text-slate-400">สูตรเด็ดปรุงสดใหม่ทุกจาน</p>
+                    </div>
+                </div>
+                
+                <div id="sauce-container" class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <!-- Javascript will render sauces here -->
+                </div>
+            </section>
 
-                    <!-- STEP 1: Ingredient Customizer -->
-                    <div id="customer-step-1" class="space-y-6">
-                        <!-- Salad Base Choice (Single choice) -->
-                        <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
-                            <h2 class="text-lg font-bold text-slate-800 flex items-center mb-4">
-                                <span class="text-xl mr-2">🍜</span> เลือกเส้น/ประเภทสลัดหลัก (ฟรี)
-                            </h2>
-                            <div class="grid grid-cols-2 md:grid-cols-4 gap-3" id="base-container">
-                                <!-- Dynamic rendering via JS -->
-                            </div>
-                        </div>
-
-                        <!-- Add-ons Selection (Checkboxes - 10 THB each) -->
-                        <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
-                            <div class="flex justify-between items-center mb-4">
-                                <h2 class="text-lg font-bold text-slate-800 flex items-center">
-                                    <span class="text-xl mr-2">🥓</span> เครื่องยำ / ท็อปปิ้ง (+10.-/รายการ)
-                                </h2>
-                                <span class="text-xs bg-orange-50 text-orange-600 px-2.5 py-1 rounded-md font-medium">เลือกได้ไม่จำกัด</span>
-                            </div>
-
-                            <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">กลุ่มเนื้อสัตว์</h3>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6" id="meats-container"></div>
-
-                            <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">กลุ่มซีฟู้ด</h3>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6" id="seafood-container"></div>
-
-                            <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">กลุ่มผักและสมุนไพร</h3>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3" id="veggies-container"></div>
-                        </div>
-
-                        <!-- Spicy & Flavor Preference -->
-                        <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
-                            <h2 class="text-lg font-bold text-slate-800 flex items-center mb-4">
-                                <span class="text-xl mr-2">🔥</span> ปรุงรสตามชอบ (ไม่บวกเพิ่ม)
-                            </h2>
-
-                            <!-- Spiciness Level -->
-                            <div class="mb-5">
-                                <label class="block text-sm font-medium text-slate-600 mb-2">ระดับความเผ็ด</label>
-                                <div class="grid grid-cols-4 gap-2" id="spicy-container"></div>
-                            </div>
-
-                            <!-- Anchovy sauce selection removed, Sweet/Flavor preference only -->
-                            <div>
-                                <label class="block text-sm font-medium text-slate-600 mb-2">ความเปรี้ยว / หวาน (ปรุงรสเพิ่ม)</label>
-                                <div class="grid grid-cols-2 gap-2" id="sweet-container"></div>
-                            </div>
-                        </div>
-
-                        <!-- Next Button Step 1 -->
-                        <div class="flex justify-end">
-                            <button onclick="goToStep(2)" class="w-full md:w-auto bg-gradient-to-r from-orange-500 to-red-500 text-white font-semibold px-8 py-3.5 rounded-xl shadow-lg hover:from-orange-600 hover:to-red-600 transition-all transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center space-x-2">
-                                <span>ระบุข้อมูลจัดส่ง</span>
-                                <i class="fa-solid fa-arrow-right"></i>
-                            </button>
+            <!-- SECTION 2: Choose Ingredients (เครื่องยำ) -->
+            <section class="bg-white rounded-3xl p-5 md:p-6 shadow-sm border border-slate-100">
+                <div class="flex items-center justify-between mb-4 border-b border-slate-50 pb-3">
+                    <div class="flex items-center space-x-2.5">
+                        <span class="text-2xl">🍢</span>
+                        <div>
+                            <h2 class="text-base md:text-lg font-bold text-slate-800">2. เลือกเครื่องยำ (ราคาต่อไม้)</h2>
+                            <p class="text-[11px] text-slate-400">เลือกกี่อย่างก็ได้ตามต้องการ</p>
                         </div>
                     </div>
+                    <button onclick="resetSaladState()" class="text-xs text-slate-400 hover:text-rose-500 font-medium flex items-center space-x-1 transition-colors">
+                        <i class="fa-solid fa-rotate-left"></i>
+                        <span>รีเซ็ตใหม่</span>
+                    </button>
+                </div>
 
-                    <!-- STEP 2: Delivery & Customer Info -->
-                    <div id="customer-step-2" class="hidden space-y-6">
-                        <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
-                            <h2 class="text-lg font-bold text-slate-800 flex items-center mb-4">
-                                <span class="text-xl mr-2">📋</span> ข้อมูลผู้สั่งและการจัดส่ง
-                            </h2>
+                <div id="ingredients-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                    <!-- Javascript will render ingredients here -->
+                </div>
+            </section>
+
+            <!-- SECTION 3: Choose Spiciness (ระดับความเผ็ด) -->
+            <section class="bg-white rounded-3xl p-5 md:p-6 shadow-sm border border-slate-100">
+                <div class="flex items-center space-x-2.5 mb-4 border-b border-slate-50 pb-3">
+                    <span class="text-2xl">🌶️</span>
+                    <div>
+                        <h2 class="text-base md:text-lg font-bold text-slate-800">3. เลือกระดับความเผ็ด</h2>
+                        <p class="text-[11px] text-slate-400">พริกสวนสดแท้ บดละเอียด</p>
+                    </div>
+                </div>
+                
+                <div id="spicy-container" class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    <!-- Javascript will render spicy levels here -->
+                </div>
+            </section>
+
+            <!-- Checkout Summary Bar -->
+            <div class="bg-white rounded-3xl p-5 shadow-lg border border-orange-100 flex flex-col md:flex-row md:items-center justify-between gap-4 sticky bottom-4 z-40 transform transition-all duration-300">
+                <div class="flex items-center space-x-4">
+                    <div class="p-3 bg-orange-100 text-orange-600 rounded-2xl">
+                        <i class="fa-solid fa-basket-shopping text-xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs text-slate-400 font-medium">รวมยอดสั่งซื้อเบื้องต้น</p>
+                        <p class="text-2xl font-black text-slate-800">฿<span id="cart-summary-price">0</span> <span class="text-xs font-normal text-slate-400">(ยังไม่รวมค่าส่ง 10 บ.)</span></p>
+                    </div>
+                </div>
+                <button onclick="goToStep(2)" id="btn-next-step" class="w-full md:w-auto px-8 py-4 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-bold rounded-2xl shadow-md hover:shadow-lg transform active:scale-95 transition-all text-center flex items-center justify-center space-x-2">
+                    <span>ดำเนินการต่อ</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- STEP 2: Delivery & Pickup Information -->
+        <div id="customer-step-2" class="hidden space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Inputs Section -->
+                <div class="md:col-span-2 space-y-6">
+                    <section class="bg-white rounded-3xl p-5 md:p-6 shadow-sm border border-slate-100">
+                        <div class="flex items-center space-x-2.5 mb-4 border-b border-slate-50 pb-3">
+                            <span class="text-2xl">📍</span>
+                            <div>
+                                <h2 class="text-base md:text-lg font-bold text-slate-800">ข้อมูลจัดส่งและการรับอาหาร</h2>
+                                <p class="text-[11px] text-slate-400">ระบุหอพักปลายทางที่ต้องการรับของ</p>
+                            </div>
+                        </div>
+
+                        <!-- Important Dorm Info Alerts -->
+                        <div class="mb-5 bg-gradient-to-r from-amber-50 to-orange-50 border-l-4 border-orange-500 p-4 rounded-xl space-y-2">
+                            <div class="flex items-center space-x-2 text-orange-800 font-bold text-xs md:text-sm">
+                                <i class="fa-solid fa-clock animate-bounce"></i>
+                                <span>เวลาจัดส่งและจุดรับอาหาร</span>
+                            </div>
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                🕒 ท่านจะได้รับอาหารภายในช่วงเวลา <span class="font-extrabold text-orange-600">17.00 - 17.30 น.</span> โดยรับได้ที่ <span class="font-extrabold text-slate-800">"ใต้หอพัก"</span> ที่ท่านเลือก
+                            </p>
+                            <div class="pt-1.5 border-t border-orange-200/50 flex items-center justify-between text-xs text-slate-500">
+                                <span class="flex items-center"><i class="fa-brands fa-instagram mr-1 text-pink-600"></i> แจ้งเตือนสถานะเมื่อยำเสร็จผ่านทาง</span>
+                                <a href="https://www.instagram.com/yumsing.mhosab/" target="_blank" class="font-bold text-orange-600 underline hover:text-orange-700 flex items-center">
+                                    Story IG: yumsing.mhosab <i class="fa-solid fa-up-right-from-square ml-0.5 text-[9px]"></i>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Fields Form -->
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">เลือกหอพักจัดส่ง <span class="text-rose-500">*</span></label>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <button type="button" onclick="selectDormLocation('หอหญิง 1')" id="btn-dorm-female1" class="p-4 border-2 rounded-2xl text-center font-bold transition-all duration-200 hover:border-orange-500 text-slate-700 border-slate-200">
+                                        <span class="block text-xl mb-1">🏢</span>
+                                        <span class="text-sm">หอหญิง 1</span>
+                                    </button>
+                                    <button type="button" onclick="selectDormLocation('หอชาย 4')" id="btn-dorm-male4" class="p-4 border-2 rounded-2xl text-center font-bold transition-all duration-200 hover:border-orange-500 text-slate-700 border-slate-200">
+                                        <span class="block text-xl mb-1">🏢</span>
+                                        <span class="text-sm">หอชาย 4</span>
+                                    </button>
+                                </div>
+                            </div>
+
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label class="block text-sm font-medium text-slate-600 mb-1">ชื่อผู้สั่ง <span class="text-red-500">*</span></label>
-                                    <input type="text" id="cust-name" placeholder="ระบุชื่อของคุณ" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500">
+                                    <label for="cust-name" class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">ชื่อผู้สั่งซื้อ / ชื่อเล่น <span class="text-rose-500">*</span></label>
+                                    <input type="text" id="cust-name" placeholder="ระบุชื่อเรียกผู้รับอาหาร" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all">
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-medium text-slate-600 mb-1">เบอร์โทรศัพท์ติดต่อ <span class="text-red-500">*</span></label>
-                                    <input type="tel" id="cust-phone" placeholder="เช่น 0812345678" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500">
+                                    <label for="cust-phone" class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">เบอร์โทรศัพท์มือถือ <span class="text-rose-500">*</span></label>
+                                    <input type="tel" id="cust-phone" placeholder="เช่น 0812345678" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all">
                                 </div>
                             </div>
 
-                            <!-- Order Type (Delivery vs Pick up) -->
-                            <div class="mt-5">
-                                <label class="block text-sm font-medium text-slate-600 mb-2">วิธีรับอาหาร <span class="text-red-500">*</span></label>
-                                <div class="grid grid-cols-2 gap-3">
-                                    <label class="border-2 border-orange-500 bg-orange-50/50 rounded-xl p-3.5 flex items-center space-x-3 cursor-pointer text-orange-700 font-medium transition-all" id="label-type-delivery">
-                                        <input type="radio" name="order-type" value="delivery" checked onchange="toggleOrderType('delivery')" class="accent-orange-500 w-4 h-4">
-                                        <span>🏍️ ส่งเดลิเวอรี (มีค่าส่งตามระยะทาง)</span>
-                                    </label>
-                                    <label class="border-2 border-slate-200 rounded-xl p-3.5 flex items-center space-x-3 cursor-pointer text-slate-600 font-medium transition-all" id="label-type-pickup">
-                                        <input type="radio" name="order-type" value="pickup" onchange="toggleOrderType('pickup')" class="accent-orange-500 w-4 h-4">
-                                        <span>🛍️ รับเองที่ร้าน (ไม่มีค่าส่ง)</span>
-                                    </label>
-                                </div>
-                            </div>
-
-                            <!-- Delivery details or pickup time -->
-                            <div class="mt-5 space-y-4">
-                                <div id="delivery-address-box">
-                                    <label class="block text-sm font-medium text-slate-600 mb-1">ที่อยู่ที่ต้องการให้ส่ง <span class="text-red-500">*</span></label>
-                                    <textarea id="cust-address" rows="3" placeholder="ระบุบ้านเลขที่, ถนน, ซอย, หมู่บ้าน, จุดสังเกต หรือรายละเอียดพิกัดจัดส่ง" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"></textarea>
-                                </div>
-
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div>
-                                        <label class="block text-sm font-medium text-slate-600 mb-1">เวลาที่ต้องการรับอาหาร <span class="text-red-500">*</span></label>
-                                        <input type="time" id="cust-time" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500">
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium text-slate-600 mb-1">หมายเหตุเพิ่มเติมถึงคนปรุง (ถ้ามี)</label>
-                                        <input type="text" id="cust-note" placeholder="เช่น ไม่ใส่ผักชี, ขอรสเปรี้ยวนำ" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500">
-                                    </div>
-                                </div>
+                            <div>
+                                <label for="cust-note" class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">หมายเหตุเพิ่มเติมถึงร้าน (ถ้ามี)</label>
+                                <textarea id="cust-note" rows="2" placeholder="เช่น ไม่ใส่ผักชีฝรั่ง, ขอช้อนส้อม ฯลฯ" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all resize-none"></textarea>
                             </div>
                         </div>
-
-                        <!-- Back / Next Buttons Step 2 -->
-                        <div class="flex justify-between space-x-4">
-                            <button onclick="goToStep(1)" class="w-1/2 md:w-auto bg-slate-100 text-slate-600 font-semibold px-6 py-3.5 rounded-xl hover:bg-slate-200 transition-all flex items-center justify-center space-x-2">
-                                <i class="fa-solid fa-arrow-left"></i>
-                                <span>ย้อนกลับ</span>
-                            </button>
-                            <button onclick="goToStep(3)" class="w-1/2 md:w-auto bg-gradient-to-r from-orange-500 to-red-500 text-white font-semibold px-8 py-3.5 rounded-xl shadow-lg hover:from-orange-600 hover:to-red-600 transition-all transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center space-x-2">
-                                <span>ชำระเงินและส่งออเดอร์</span>
-                                <i class="fa-solid fa-credit-card"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- STEP 3: Payment & Slip Upload -->
-                    <div id="customer-step-3" class="hidden space-y-6">
-                        <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
-                            <h2 class="text-lg font-bold text-slate-800 flex items-center mb-4">
-                                <span class="text-xl mr-2">💳</span> สแกนจ่ายด้วยพร้อมเพย์ (Dynamic QR)
-                            </h2>
-
-                            <div class="bg-slate-50 rounded-xl p-4 flex flex-col md:flex-row items-center justify-center gap-6 mb-6">
-                                <!-- QR Display Box -->
-                                <div class="bg-white p-4 rounded-xl shadow-md border border-slate-200 text-center flex flex-col items-center">
-                                    <!-- PromptPay ThaiQR Header Logo mockup -->
-                                    <div class="w-full flex justify-center mb-2">
-                                        <img src="https://placehold.co/180x40/003366/ffffff?text=PromptPay+QR" alt="Promptpay Logo" class="h-8 rounded" onerror="this.style.display='none'">
-                                    </div>
-                                    <!-- Dynamic QR Image from API -->
-                                    <div class="w-48 h-48 bg-slate-100 flex items-center justify-center rounded-lg overflow-hidden relative border">
-                                        <img id="qr-code-img" src="" alt="PromptPay QR Code" class="w-full h-full object-contain">
-                                        <div id="qr-loading" class="absolute inset-0 bg-white/90 flex flex-col items-center justify-center space-y-2">
-                                            <i class="fa-solid fa-spinner animate-spin text-orange-500 text-2xl"></i>
-                                            <span class="text-xs text-slate-400">กำลังเจนคิวอาร์...</span>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <p class="text-xs text-slate-400">โอนเข้าบัญชีพร้อมเพย์ร้าน</p>
-                                        <p class="text-lg font-bold text-slate-700" id="shop-promptpay-display">081-234-5678</p>
-                                        <p class="text-xs text-orange-600 font-medium">ชื่อบัญชี: แซ่บเวอร์ สั่งออนไลน์ (ยำรสจัดจ้าน)</p>
-                                    </div>
-                                    <hr class="border-dashed border-slate-200">
-                                    <div>
-                                        <p class="text-xs text-slate-400">ยอดเงินที่ต้องโอน</p>
-                                        <p class="text-3xl font-brand font-bold text-red-500"><span id="payment-price-display">0</span> บาท</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Slip Upload Field -->
-                            <div class="space-y-3">
-                                <label class="block text-sm font-medium text-slate-700">แนบสลิปการโอนเงินเพื่อยืนยันออเดอร์ <span class="text-red-500">*</span></label>
-
-                                <div class="flex flex-col items-center justify-center w-full space-y-3">
-                                    <!-- Dropzone wrapper (Changed from label to div to stop native label-click triggering file chooser) -->
-                                    <div id="dropzone" onclick="triggerFileInput()" class="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-slate-300 rounded-xl cursor-pointer hover:bg-slate-50 transition-all bg-white relative overflow-hidden group">
-                                        <!-- Placeholder text and icon -->
-                                        <div class="flex flex-col items-center justify-center pt-5 pb-6 text-center px-4" id="upload-placeholder">
-                                            <i class="fa-solid fa-cloud-arrow-up text-3xl text-slate-400 mb-2 group-hover:text-orange-500 transition-colors"></i>
-                                            <p class="text-sm text-slate-500 font-medium">กดตรงนี้ หรือ ลากไฟล์รูปสลิปมาวาง</p>
-                                            <p class="text-xs text-slate-400 mt-1">รองรับไฟล์รูปภาพ PNG, JPG ขนาดไม่เกิน 5MB</p>
-                                        </div>
-                                        <!-- Image Preview container -->
-                                        <div id="upload-preview-container" class="hidden absolute inset-0 bg-white flex items-center justify-center p-2">
-                                            <img id="upload-preview-img" src="" alt="Slip Preview" class="h-full object-contain rounded-lg">
-                                        </div>
-                                        <!-- Hidden Native File input -->
-                                        <input type="file" id="slip-input" accept="image/*" class="hidden" onchange="handleSlipUpload(event)">
-                                    </div>
-
-                                    <!-- Separated Actions for Uploading and Clearing slip -->
-                                    <div class="flex w-full gap-3">
-                                        <button type="button" onclick="triggerFileInput()" class="flex-1 bg-orange-100 hover:bg-orange-200 text-orange-700 font-semibold py-2 px-4 rounded-xl text-xs md:text-sm transition-colors flex items-center justify-center space-x-2">
-                                            <i class="fa-solid fa-file-image"></i>
-                                            <span>เลือกรูปภาพสลิป</span>
-                                        </button>
-                                        <button type="button" id="btn-clear-slip" onclick="clearUploadedSlip(event)" class="hidden flex-1 bg-red-100 hover:bg-red-200 text-red-600 font-semibold py-2 px-4 rounded-xl text-xs md:text-sm transition-colors flex items-center justify-center space-x-2">
-                                            <i class="fa-solid fa-trash-can"></i>
-                                            <span>ลบรูปสลิปนี้</span>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Back / Finalize buttons -->
-                        <div class="flex justify-between space-x-4">
-                            <button onclick="goToStep(2)" class="w-1/2 md:w-auto bg-slate-100 text-slate-600 font-semibold px-6 py-3.5 rounded-xl hover:bg-slate-200 transition-all flex items-center justify-center space-x-2">
-                                <i class="fa-solid fa-arrow-left"></i>
-                                <span>ย้อนกลับ</span>
-                            </button>
-                            <button id="btn-submit-order" onclick="submitFinalOrder()" class="w-1/2 md:w-auto bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold px-8 py-3.5 rounded-xl shadow-lg hover:from-green-600 hover:to-emerald-700 transition-all transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center space-x-2">
-                                <span id="btn-submit-text">ยืนยันการสั่งซื้อ</span>
-                                <i class="fa-solid fa-check"></i>
-                            </button>
-                        </div>
-                    </div>
+                    </section>
                 </div>
 
-                <!-- Right Side: Order Receipt / Cart Live Preview -->
-                <div class="lg:col-span-1">
-                    <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 sticky top-24 space-y-4">
-                        <h3 class="font-bold text-slate-800 text-lg border-b border-dashed pb-3 flex items-center justify-between">
-                            <span>🛒 ออเดอร์ของคุณ</span>
-                            <span class="text-xs font-normal text-slate-400 cursor-pointer hover:text-red-500" onclick="resetSaladState()">ล้างรายการใหม่</span>
+                <!-- Order Summary Sidebar -->
+                <div class="space-y-6">
+                    <section class="bg-white rounded-3xl p-5 shadow-sm border border-slate-100 sticky top-6">
+                        <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wider mb-4 border-b border-slate-50 pb-2 flex items-center justify-between">
+                            <span>รายการคำสั่งซื้อ</span>
+                            <span class="text-[10px] text-slate-400 font-normal">แวะเช็คความถูกต้องก่อนจ้า</span>
                         </h3>
 
-                        <!-- Real-time Cart Details -->
-                        <div class="space-y-3 py-1 text-sm max-h-72 overflow-y-auto pr-1" id="cart-list">
-                            <!-- Dynamic Itemized Cart List -->
+                        <!-- Receipt Box -->
+                        <div class="space-y-3">
+                            <div class="bg-slate-50 rounded-2xl p-4">
+                                <div id="receipt-sauce" class="mb-2.5 pb-2.5 border-b border-slate-200/50">
+                                    <!-- Sauce info rendered dynamically -->
+                                </div>
+                                <div id="cart-list" class="space-y-1.5 max-h-48 overflow-y-auto pr-1">
+                                    <!-- Javascript lists selected toppings here -->
+                                </div>
+                            </div>
+
+                            <!-- Pricing -->
+                            <div class="space-y-2 pt-2 border-t border-slate-100 text-xs">
+                                <div class="flex justify-between text-slate-500">
+                                    <span>ค่าอาหาร (เครื่องยำ)</span>
+                                    <span id="addon-price-label">0 บาท</span>
+                                </div>
+                                <div class="flex justify-between text-slate-500">
+                                    <span>ค่าน้ำยำ</span>
+                                    <span class="text-green-600 font-bold">ฟรี</span>
+                                </div>
+                                <div class="flex justify-between text-slate-500">
+                                    <span>ค่าจัดส่ง (ส่งใต้หอพัก)</span>
+                                    <span id="delivery-price-label">10 บาท</span>
+                                </div>
+                                <div class="flex justify-between text-base font-extrabold text-slate-800 pt-2 border-t border-slate-100">
+                                    <span>รวมยอดสุทธิ</span>
+                                    <span>฿<span id="cart-grand-total">0</span></span>
+                                </div>
+                            </div>
                         </div>
 
-                        <hr class="border-dashed border-slate-200">
-
-                        <!-- Order Calculations -->
-                        <div class="space-y-2 text-sm text-slate-600">
-                            <div class="flex justify-between">
-                                <span>ราคายำพื้นฐาน</span>
-                                <span>40 บาท</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span id="addon-count-label">เครื่องยำเพิ่มเติม (0 ชิ้น)</span>
-                                <span id="addon-price-label">0 บาท</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span>ค่าบริการจัดส่ง</span>
-                                <span id="delivery-price-label">40 บาท</span>
-                            </div>
+                        <!-- Next & Back Buttons -->
+                        <div class="grid grid-cols-3 gap-2.5 mt-5">
+                            <button onclick="goToStep(1)" class="col-span-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-3.5 rounded-xl transition-all text-xs flex items-center justify-center space-x-1">
+                                <i class="fa-solid fa-arrow-left"></i>
+                                <span>กลับ</span>
+                            </button>
+                            <button onclick="goToStep(3)" class="col-span-2 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-bold py-3.5 rounded-xl transition-all text-xs flex items-center justify-center space-x-1 shadow-md">
+                                <span>ขั้นตอนจ่ายเงิน</span>
+                                <i class="fa-solid fa-chevron-right"></i>
+                            </button>
                         </div>
-
-                        <hr class="border-slate-100">
-
-                        <!-- Grand Total -->
-                        <div class="flex justify-between items-center pt-2">
-                            <span class="font-bold text-slate-800">ยอดชำระทั้งหมด:</span>
-                            <span class="font-brand font-bold text-2xl text-red-500"><span id="cart-grand-total">80</span> บาท</span>
-                        </div>
-                    </div>
+                    </section>
                 </div>
             </div>
         </div>
 
-    </main>
+        <!-- STEP 3: Payment and Slip Upload -->
+        <div id="customer-step-3" class="hidden max-w-xl mx-auto">
+            <section class="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 space-y-6">
+                <div class="flex items-center space-x-2.5 border-b border-slate-50 pb-3">
+                    <span class="text-2xl">💳</span>
+                    <div>
+                        <h2 class="text-base md:text-lg font-bold text-slate-800">ชำระเงินและแจ้งโอน</h2>
+                        <p class="text-[11px] text-slate-400">สแกน QR PromptPay เพื่อชำระเงินโดยไม่มีขั้นต่ำ</p>
+                    </div>
+                </div>
 
-    <!-- Page Footer -->
-    <footer class="bg-slate-900 text-slate-400 py-6 mt-12 border-t border-slate-800 text-center text-xs">
-        <div class="max-w-6xl mx-auto px-4 space-y-2">
-            <p class="font-brand text-orange-500 text-lg">แซ่บเวอร์ ออนไลน์ - ยำสดสะอาด อร่อยจัดจ้านพริกสิบเม็ด</p>
-            <p>&copy; 2026 แซ่บเวอร์ ออนไลน์. สงวนลิขสิทธิ์.</p>
+                <!-- Price and Promptpay QR Card -->
+                <div class="bg-gradient-to-br from-slate-900 to-slate-800 text-white rounded-2xl p-6 shadow-md relative overflow-hidden flex flex-col items-center justify-center text-center">
+                    <div class="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,rgba(249,115,22,0.15),transparent)]"></div>
+                    
+                    <p class="text-xs text-orange-400 font-bold uppercase tracking-wider mb-1">ยอดโอนเงินทั้งหมด</p>
+                    <p class="text-4xl font-black mb-1 text-white">฿<span id="payment-price-display">0</span></p>
+                    <p class="text-[10px] text-slate-400 mb-6">ยอดรวมสุทธิ (เครื่องยำ + ค่าจัดส่ง 10 บ.)</p>
+
+                    <!-- QR Promptpay Wrapper -->
+                    <div class="bg-white p-4 rounded-2xl shadow-inner relative max-w-[200px] w-full">
+                        <div id="qr-loading" class="absolute inset-0 bg-white/95 rounded-2xl flex flex-col items-center justify-center text-slate-500 z-10">
+                            <i class="fa-solid fa-spinner animate-spin text-2xl text-orange-500 mb-1"></i>
+                            <span class="text-[9px]">กำลังสร้างคิวอาร์...</span>
+                        </div>
+                        <img id="qr-code-img" src="" alt="PromptPay QR Code" class="w-full h-auto aspect-square object-contain">
+                    </div>
+
+                    <div class="mt-4 text-center">
+                        <p class="text-xs text-slate-300 font-medium">สแกนชำระเงินผ่านแอปธนาคารใดก็ได้</p>
+                        <p class="text-[10px] text-slate-400 mt-1">ชื่อบัญชี: SCB มณี SHOP (MPD 7) • ส่งสลิปเพื่อยืนยันออเดอร์ด้านล่าง</p>
+                    </div>
+                </div>
+
+                <!-- Upload Slip File Section -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">แนบหลักฐานสลิปโอนเงิน <span class="text-rose-500">*</span></label>
+                    
+                    <!-- File input hidden -->
+                    <input type="file" id="slip-input" accept="image/*" class="hidden" onchange="handleSlipUpload(event)">
+                    
+                    <!-- Simulated Click Container -->
+                    <div onclick="triggerFileInput()" id="upload-container" class="border-2 border-dashed border-slate-200 hover:border-orange-500 bg-slate-50/50 hover:bg-orange-50/10 rounded-2xl p-6 text-center cursor-pointer transition-all flex flex-col items-center justify-center group relative overflow-hidden min-h-[160px]">
+                        
+                        <div id="upload-placeholder" class="space-y-2">
+                            <div class="w-12 h-12 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center mx-auto transition-transform group-hover:scale-110">
+                                <i class="fa-solid fa-cloud-arrow-up text-lg"></i>
+                            </div>
+                            <p class="text-xs font-bold text-slate-700">คลิกเพื่อเลือกไฟล์รูปภาพสลิป</p>
+                            <p class="text-[10px] text-slate-400">รองรับไฟล์ JPG, PNG หรือภาพถ่ายหน้าจอโทรศัพท์</p>
+                        </div>
+
+                        <div id="upload-preview-container" class="hidden w-full h-full flex flex-col items-center justify-center">
+                            <img id="upload-preview-img" src="" alt="Slip Preview" class="max-h-40 object-contain rounded-lg shadow-sm mb-2 border border-slate-100">
+                            <span class="text-xs font-bold text-green-600 flex items-center"><i class="fa-solid fa-circle-check mr-1"></i> อัปโหลดรูปภาพสำเร็จ</span>
+                        </div>
+                    </div>
+
+                    <!-- Clear slip button container -->
+                    <div class="flex justify-end mt-2">
+                        <button type="button" id="btn-clear-slip" onclick="clearUploadedSlip(event)" class="hidden text-xs text-rose-500 hover:text-rose-700 font-semibold flex items-center space-x-1">
+                            <i class="fa-solid fa-trash-can"></i>
+                            <span>ลบไฟล์สลิปเพื่อแนบใหม่</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Final Submit Trigger -->
+                <div class="pt-2">
+                    <button onclick="submitFinalOrder()" id="btn-submit-order" class="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-extrabold py-4 rounded-2xl shadow-md hover:shadow-lg transform active:scale-95 transition-all text-center flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-paper-plane"></i>
+                        <span id="btn-submit-text">ส่งรายการออเดอร์อาหาร</span>
+                    </button>
+                    
+                    <button onclick="goToStep(2)" class="w-full text-center text-xs text-slate-400 hover:text-slate-600 mt-4 transition-colors font-medium">
+                        <i class="fa-solid fa-chevron-left mr-1"></i> ย้อนกลับไปแก้ไขข้อมูลจัดส่ง
+                    </button>
+                </div>
+            </section>
         </div>
-    </footer>
+    </main>
+</div>
 
-    <!-- Firebase core components loading -->
-    <script type="module" src="order.js"></script>
+<!-- Custom Toasts notifications container -->
+<div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col space-y-2.5 max-w-sm pointer-events-none"></div>
+
+<footer class="bg-slate-900 text-slate-400 py-6 mt-12 border-t border-slate-800 text-center text-xs">
+        <div class="max-w-6xl mx-auto px-4 space-y-2">
+            <p class="font-brand text-orange-500 text-lg">ยำเด็ด7ย่านน้ำ - แซ่บนัวอร่อยถูกใจ</p>
+            <p>&copy; 2026 ยำเด็ด7ย่านน้ำ. สงวนลิขสิทธิ์.</p>
+        </div>
+</footer>
+
+<!-- External JS -->
+<script src="order.js" type="module"></script>
+
 </body>
 </html>

@@ -1,166 +1,202 @@
 <!DOCTYPE html>
-<html lang="th">
+<html lang="th" class="h-full bg-slate-100">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ยำเด็ดเจ็ดย่านน้ำ - ร้านค้าหลังบ้าน</title>
+    <title>ระบบพนักงาน - ยำเด็ด7ย่านน้ำ</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts: Prompt & Sriracha for local look -->
+    <!-- Google Fonts Prompt -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Sriracha&display=swap" rel="stylesheet">
-
-    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body {
+            font-family: 'Prompt', sans-serif;
+        }
+    </style>
 </head>
-<body class="text-slate-800 min-h-screen flex flex-col">
+<body class="h-full text-slate-800 antialiased">
 
-    <!-- Top Navbar -->
-    <header class="bg-gradient-to-r from-red-500 via-orange-500 to-yellow-500 text-white shadow-md sticky top-0 z-50">
-        <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
-            <div class="flex items-center space-x-2">
-                <span class="text-3xl">🌶️</span>
-                <span class="text-2xl font-brand font-bold tracking-wider">ยำเด็ดเจ็ดย่านน้ำ ออนไลน์</span>
-                <span class="text-xs font-medium bg-white/20 px-2 py-0.5 rounded-full">ร้านค้าหลังบ้าน</span>
+<div class="min-h-screen flex flex-col">
+    <!-- LOGIN SCREEN -->
+    <div id="loginBox" class="flex-grow flex items-center justify-center px-4 py-12 bg-gradient-to-br from-rose-600 via-orange-500 to-amber-500">
+        <div class="max-w-md w-full space-y-8 bg-white p-8 md:p-10 rounded-3xl shadow-2xl relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-yellow-400 to-orange-500"></div>
+            <div class="text-center">
+                <span class="text-5xl">🌶️</span>
+                <h2 class="mt-4 text-2xl md:text-3xl font-extrabold text-slate-950">ระบบจัดการหลังบ้าน</h2>
+                <p class="mt-2 text-xs text-slate-400">ร้านยำเด็ด7ย่านน้ำ - สำหรับพนักงานเข้าสู่ระบบ</p>
             </div>
-            <a href="order.html" class="px-4 py-1.5 rounded-full text-xs md:text-sm font-medium bg-white/20 hover:bg-white/30 transition-all">
-                <i class="fa-solid fa-utensils mr-1.5"></i>ไปหน้าสั่งยำ
-            </a>
-        </div>
-    </header>
-
-    <!-- Custom Notification Toast Container -->
-    <div id="toast-container" class="fixed top-20 right-4 z-50 flex flex-col space-y-2 pointer-events-none max-w-sm w-full"></div>
-
-    <!-- Main Content Grid -->
-    <main class="flex-grow max-w-6xl mx-auto w-full px-4 py-6">
-        
-        <section id="loginBox">
-            <h2>Merchant Login</h2>
-            <input id="email" type="email" placeholder="Email">
-            <input id="password" type="password" placeholder="Password">
-            <button id="loginBtn">Login</button>
-            <p id="loginError" style="color:red;"></p>
-        </section>
-
-        <section id="merchantPanel" style="display:none;">
-            <button id="logoutBtn">Logout</button>
-            <h2>Orders</h2>
-            <div id="orders"></div>
-        </section>
-
-        <!-- MERCHANT BACKEND VIEW -->
-        <div id="merchant-view" class="space-y-6">
-            <!-- Merchant Dashboard Stats bar -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center space-x-4">
-                    <div class="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center text-orange-600 text-xl">
-                        <i class="fa-solid fa-bowl-rice"></i>
-                    </div>
-                    <div>
-                        <p class="text-xs text-slate-400 font-medium">ออเดอร์รอทำทั้งหมด</p>
-                        <p class="text-2xl font-bold text-slate-800" id="merchant-stat-pending">0</p>
+            
+            <div class="mt-8 space-y-4">
+                <div>
+                    <label for="email" class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">อีเมลพนักงาน</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400">
+                            <i class="fa-solid fa-envelope"></i>
+                        </span>
+                        <input id="email" type="email" required class="appearance-none rounded-xl relative block w-full pl-10 pr-3 py-3 border border-slate-200 placeholder-slate-400 text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all text-sm" placeholder="staff@yumsing.com">
                     </div>
                 </div>
-                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center space-x-4">
-                    <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center text-green-600 text-xl">
-                        <i class="fa-solid fa-check-circle"></i>
-                    </div>
-                    <div>
-                        <p class="text-xs text-slate-400 font-medium">เสร็จสิ้นแล้ววันนี้</p>
-                        <p class="text-2xl font-bold text-slate-800" id="merchant-stat-completed">0</p>
-                    </div>
-                </div>
-                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center space-x-4">
-                    <div class="w-12 h-12 bg-yellow-100 rounded-xl flex items-center justify-center text-yellow-600 text-xl">
-                        <i class="fa-solid fa-wallet"></i>
-                    </div>
-                    <div>
-                        <p class="text-xs text-slate-400 font-medium">ยอดขายรวมสะสม (บาท)</p>
-                        <p class="text-2xl font-bold text-slate-800" id="merchant-stat-sales">0.-</p>
+                <div>
+                    <label for="password" class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">รหัสผ่าน</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400">
+                            <i class="fa-solid fa-lock"></i>
+                        </span>
+                        <input id="password" type="password" required class="appearance-none rounded-xl relative block w-full pl-10 pr-3 py-3 border border-slate-200 placeholder-slate-400 text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all text-sm" placeholder="••••••••">
                     </div>
                 </div>
-                <!-- PromptPay Config Setting -->
-                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-center space-y-2">
-                    <div class="flex items-center justify-between">
-                        <span class="text-xs text-slate-400 font-medium">เบอร์ร้านค้าสำหรับ PromptPay</span>
-                        <button onclick="togglePromptPayEdit()" class="text-orange-500 text-xs hover:underline">แก้ไข</button>
-                    </div>
-                    <div class="flex items-center space-x-2">
-                        <span class="text-sm font-bold text-slate-700" id="pp-display-num">0812345678</span>
-                        <div id="pp-edit-box" class="hidden flex space-x-1 w-full">
-                            <input type="text" id="pp-input" value="0812345678" class="border rounded px-2 py-0.5 text-xs w-full">
-                            <button onclick="savePromptPay()" class="bg-orange-500 text-white text-xs px-2 py-0.5 rounded">บันทึก</button>
-                        </div>
-                    </div>
-                </div>
+
+                <div id="loginError" class="text-xs text-rose-500 font-semibold text-center mt-2"></div>
+
+                <button id="loginBtn" class="group relative w-full flex justify-center py-3.5 px-4 border border-transparent text-sm font-bold rounded-xl text-white bg-gradient-to-r from-orange-500 to-rose-600 hover:from-orange-600 hover:to-rose-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-all shadow-md transform active:scale-95">
+                    <span class="absolute left-0 inset-y-0 flex items-center pl-3 text-orange-200 group-hover:text-white transition-colors">
+                        <i class="fa-solid fa-right-to-bracket"></i>
+                    </span>
+                    เข้าสู่ระบบพนักงาน
+                </button>
             </div>
-
-            <!-- Orders Board Layout -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- Main Order Feed (Pending/Preparing) -->
-                <div class="lg:col-span-2 space-y-4">
-                    <div class="flex justify-between items-center">
-                        <h2 class="text-xl font-bold text-slate-800 flex items-center">
-                            <span class="text-2xl mr-2">📋</span> รายการออเดอร์ใหม่ <span class="text-xs text-slate-400 ml-2">(Real-time เด้งสด)</span>
-                        </h2>
-                        <div class="flex space-x-2">
-                            <button onclick="loadOrdersFromDatabase()" class="bg-slate-100 hover:bg-slate-200 text-slate-600 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors">
-                                <i class="fa-solid fa-arrows-rotate mr-1"></i> ดึงล่าสุด
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- No orders block -->
-                    <div id="no-orders-banner" class="bg-white p-12 text-center rounded-2xl border border-dashed border-slate-200">
-                        <i class="fa-solid fa-pepper-hot text-slate-300 text-4xl mb-3"></i>
-                        <h3 class="text-slate-500 font-medium">ยังไม่มีออเดอร์เข้ามาในขณะนี้</h3>
-                        <p class="text-slate-400 text-xs mt-1">ออเดอร์ใหม่จากลูกค้าจะแสดงตรงนี้โดยอัตโนมัติ</p>
-                    </div>
-
-                    <!-- Orders List Container -->
-                    <div id="merchant-orders-list" class="space-y-4"></div>
-                </div>
-
-                <!-- Order Detail Panel & Completed Logs -->
-                <div class="lg:col-span-1 space-y-6">
-                    <!-- History Logs -->
-                    <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 space-y-4">
-                        <h3 class="font-bold text-slate-800 border-b pb-3 flex justify-between items-center">
-                            <span>📜 ออเดอร์ที่ทำเสร็จแล้ว</span>
-                            <span class="text-xs text-slate-400" id="completed-count">0 รายการ</span>
-                        </h3>
-                        <div class="space-y-3 max-h-96 overflow-y-auto pr-1" id="merchant-completed-list">
-                            <!-- Completed items render -->
-                        </div>
-                    </div>
-                </div>
+            <div class="text-center pt-2">
+                <p class="text-[10px] text-slate-400">สิทธิ์พนักงานจะถูกบันทึกผ่าน Firebase Authentication และตรวจสอบเอกสารสิทธิ์ในระบบข้อมูล</p>
             </div>
-        </div>
-
-    </main>
-
-    <!-- Custom Image Modal for Slip zooming -->
-    <div id="image-modal" class="fixed inset-0 z-50 bg-black/80 hidden items-center justify-center p-4" onclick="closeImageModal()">
-        <div class="relative max-w-lg w-full max-h-[85vh] flex items-center justify-center">
-            <img id="image-modal-src" src="" alt="Zoomed View" class="max-w-full max-h-full object-contain rounded-lg">
-            <button onclick="closeImageModal()" class="absolute top-2 right-2 bg-white/20 hover:bg-white/40 text-white rounded-full w-10 h-10 flex items-center justify-center text-xl transition-colors">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
         </div>
     </div>
 
-    <!-- Page Footer -->
-    <footer class="bg-slate-900 text-slate-400 py-6 mt-12 border-t border-slate-800 text-center text-xs">
-        <div class="max-w-6xl mx-auto px-4 space-y-2">
-            <p class="font-brand text-orange-500 text-lg">แซ่บเวอร์ ออนไลน์ - ยำสดสะอาด อร่อยจัดจ้านพริกสิบเม็ด</p>
-            <p>&copy; 2026 แซ่บเวอร์ ออนไลน์. สงวนลิขสิทธิ์.</p>
-        </div>
-    </footer>
+    <!-- MERCHANT PANEL SCREEN -->
+    <div id="merchantPanel" class="hidden flex-col flex-grow">
+        <!-- Dashboard Navigation Header -->
+        <header class="bg-slate-900 text-white shadow-md">
+            <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <span class="text-2xl">🌶️</span>
+                    <div>
+                        <h1 class="text-lg font-bold tracking-tight">ระบบพนักงานยำเด็ด7ย่านน้ำ</h1>
+                        <p class="text-[10px] text-emerald-400 font-medium flex items-center">
+                            <span class="h-2 w-2 rounded-full bg-emerald-500 inline-block mr-1.5 animate-pulse"></span> 
+                            เชื่อมต่อฐานข้อมูลสั่งยำออนไลน์แล้ว
+                        </p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <div class="hidden sm:block text-right">
+                        <p id="staff-display-name" class="text-xs font-semibold text-slate-200">ยินดีต้อนรับ พนักงาน</p>
+                        <p class="text-[9px] text-slate-400 uppercase">YumDed7YanNam Staff Portal</p>
+                    </div>
+                    <button id="logoutBtn" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-rose-400 hover:text-rose-300 text-xs font-bold rounded-xl transition-all border border-slate-700 flex items-center space-x-1.5">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                        <span>ออกจากระบบ</span>
+                    </button>
+                </div>
+            </div>
+        </header>
 
-    <!-- Firebase core components loading -->
-    <script type="module" src="merchant.js"></script>
+        <!-- Main Dashboard Workspace -->
+        <main class="max-w-7xl w-full mx-auto px-4 py-6 flex-grow grid grid-cols-1 lg:grid-cols-4 gap-6">
+            
+            <!-- Left Side Statistics & Archive Column -->
+            <div class="lg:col-span-1 space-y-6">
+                <!-- Live Statistic Widgets -->
+                <div class="bg-white rounded-3xl p-5 shadow-sm border border-slate-200/50 space-y-4">
+                    <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider border-b pb-2 flex items-center justify-between">
+                        <span>สรุปยอดวันนี้</span>
+                        <i class="fa-solid fa-chart-pie text-orange-500"></i>
+                    </h2>
+
+                    <!-- Stat 1: Pending Queue -->
+                    <div class="bg-amber-50 rounded-2xl p-4 border border-amber-100 flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-medium text-slate-400">ออเดอร์รอทำ</p>
+                            <p id="merchant-stat-pending" class="text-3xl font-black text-amber-700">0</p>
+                        </div>
+                        <div class="p-3 bg-amber-100 text-amber-700 rounded-xl">
+                            <i class="fa-solid fa-clock-rotate-left text-xl"></i>
+                        </div>
+                    </div>
+
+                    <!-- Stat 2: Completed today -->
+                    <div class="bg-green-50 rounded-2xl p-4 border border-green-100 flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-medium text-slate-400">ยำเสร็จแล้ว</p>
+                            <p id="merchant-stat-completed" class="text-3xl font-black text-green-700">0</p>
+                        </div>
+                        <div class="p-3 bg-green-100 text-green-700 rounded-xl">
+                            <i class="fa-solid fa-circle-check text-xl"></i>
+                        </div>
+                    </div>
+
+                    <!-- Stat 3: Income today -->
+                    <div class="bg-slate-950 text-white rounded-2xl p-4 flex items-center justify-between">
+                        <div>
+                            <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">รายได้ที่รับโอน</p>
+                            <p id="merchant-stat-sales" class="text-2xl font-black text-amber-400">0.-</p>
+                        </div>
+                        <div class="p-3 bg-slate-800 text-amber-400 rounded-xl">
+                            <i class="fa-solid fa-wallet text-lg"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Completed Orders Sidebar List -->
+                <div class="bg-white rounded-3xl p-5 shadow-sm border border-slate-200/50 space-y-4">
+                    <div class="flex items-center justify-between border-b pb-2">
+                        <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center space-x-1.5">
+                            <i class="fa-solid fa-box text-green-600"></i>
+                            <span>ประวัติสำเร็จแล้ว</span>
+                        </h2>
+                        <span id="completed-count" class="text-[10px] font-bold bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full">0 รายการ</span>
+                    </div>
+
+                    <div id="merchant-completed-list" class="space-y-3.5 max-h-[350px] overflow-y-auto pr-1">
+                        <!-- Render finished orders dynamically -->
+                        <p class="text-xs text-slate-400 text-center py-4">ยังไม่มีรายการสำเร็จในวันนี้</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content Area: Active Kitchen Orders Queue -->
+            <div class="lg:col-span-3 space-y-6">
+                <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200/50 min-h-[500px] flex flex-col">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b pb-4 mb-6">
+                        <div>
+                            <h2 class="text-lg font-black text-slate-900 flex items-center">
+                                <i class="fa-solid fa-fire text-orange-500 mr-2 animate-bounce"></i> 
+                                รายการเตรียมปรุงยำ (Real-time Order Monitor)
+                            </h2>
+                            <p class="text-xs text-slate-400">ตรวจสอบและอัปเดตสถานะของออเดอร์ที่ถูกส่งมาจากลูกค้า</p>
+                        </div>
+                    </div>
+
+                    <!-- No active queue screen -->
+                    <div id="no-orders-banner" class="hidden my-auto py-16 text-center space-y-4">
+                        <div class="w-20 h-20 bg-slate-50 text-slate-300 rounded-full flex items-center justify-center mx-auto text-4xl">
+                            <i class="fa-solid fa-clipboard-list"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-base font-bold text-slate-700">ไม่มีออเดอร์คงค้างเตรียมปรุง</h3>
+                            <p class="text-xs text-slate-400 mt-1">ออเดอร์ใหม่จากลูกค้าจะเข้ามาแสดงผลบนหน้านี้ทันทีโดยไม่ต้องรีเฟรชหน้าเว็บ</p>
+                        </div>
+                    </div>
+
+                    <!-- Pending Cards List Container -->
+                    <div id="merchant-orders-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- JS modules renders Active queue cards here -->
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+</div>
+
+<!-- Custom Toasts notifications container -->
+<div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col space-y-2.5 max-w-sm pointer-events-none"></div>
+
+<!-- APPLICATION JAVASCRIPT LOGIC -->
+<script src="merchant.js" type="module"></script>
 </body>
 </html>
