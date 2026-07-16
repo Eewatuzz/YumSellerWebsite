@@ -125,7 +125,7 @@
                     </div>
                     <div>
                         <p class="text-xs text-slate-400 font-medium">รวมยอดสั่งซื้อเบื้องต้น</p>
-                        <p class="text-2xl font-black text-slate-800">฿<span id="cart-summary-price">0</span> <span class="text-xs font-normal text-slate-400">(ยังไม่รวมค่าส่ง 10 บ.)</span></p>
+                        <p class="text-2xl font-black text-slate-800">฿<span id="cart-summary-price">0</span> <span class="text-xs font-normal text-slate-400">(ยังไม่รวมค่าส่ง 5 บ.)</span></p>
                     </div>
                 </div>
                 <button onclick="goToStep(2)" id="btn-next-step" class="w-full md:w-auto px-8 py-4 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-bold rounded-2xl shadow-md hover:shadow-lg transform active:scale-95 transition-all text-center flex items-center justify-center space-x-2">
@@ -178,6 +178,10 @@
                                     <button type="button" onclick="selectDormLocation('หอชาย 4')" id="btn-dorm-male4" class="p-4 border-2 rounded-2xl text-center font-bold transition-all duration-200 hover:border-orange-500 text-slate-700 border-slate-200">
                                         <span class="block text-xl mb-1">🏢</span>
                                         <span class="text-sm">หอชาย 4</span>
+                                    </button>
+                                    <button type="button" onclick="selectDormLocation('รับหน้าร้าน')" id="btn-dorm-store" class="p-4 border-2 rounded-2xl text-center font-bold transition-all duration-200 hover:border-orange-500 text-slate-700 border-slate-200">
+                                        <span class="block text-xl mb-1">🏢</span>
+                                        <span class="text-sm">รับหน้าร้าน</span>
                                     </button>
                                 </div>
                             </div>
@@ -232,7 +236,7 @@
                                 </div>
                                 <div class="flex justify-between text-slate-500">
                                     <span>ค่าจัดส่ง (ส่งใต้หอพัก)</span>
-                                    <span id="delivery-price-label">10 บาท</span>
+                                    <span id="delivery-price-label">5 บาท</span>
                                 </div>
                                 <div class="flex justify-between text-base font-extrabold text-slate-800 pt-2 border-t border-slate-100">
                                     <span>รวมยอดสุทธิ</span>

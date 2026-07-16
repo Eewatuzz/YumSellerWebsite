@@ -14,10 +14,10 @@ const state = {
         spiciness: 'เผ็ดกลาง', // Spicy level default
         custName: '',          // Customer name
         custPhone: '',         // Customer phone number
-        dormLocation: '',      // Selectable dorm (หอหญิง 1 or หอชาย 4)
+        dormLocation: '',      // Selectable dorm (หอหญิง 1 or หอชาย 4 or รับหน้าร้าน)
         note: '',              // Cooking notes
         slipBase64: '',        // Encoded proof slip image
-        totalPrice: 10,        // Default price is delivery fee (10 Baht)
+        totalPrice: 5,         // Default price is delivery fee (5 Baht)
     }
 };
 
@@ -25,32 +25,33 @@ const state = {
 const SAUCE_OPTIONS = [
     { id: 'sauce-original', name: 'น้ำยำออริจินัล', desc: 'ครบรส หอมเปรี้ยวมะนาวสด' },
     { id: 'sauce-plara', name: 'น้ำยำปลาร้าเลิฟเวอร์', desc: 'นัวขั้นสุด หอมกลิ่นปลาร้าเกรดพรีเมียม' },
-    { id: 'sauce-seafood', name: 'น้ำยำซีฟู้ดจี๊ดๆ', desc: 'รสแซ่บจี๊ดจ๊าด สะใจสายเผ็ดเปรี้ยว' }
+    { id: 'sauce-seafood', name: 'น้ำยำซีฟู้ดจี๊ดๆ', desc: 'รสแซ่บจี๊ดจ๊าด สะใจสายเผ็ดเปรี้ยว' },
+    { id: 'sauce-not-accepted', name: 'ไม่รับน้ำยำ', desc: 'ตัวแม่จะแคร์เพื่อ?!?' }
 ];
 
 const INGREDIENTS_LIST = [
     { id: 'lookchin-moo', name: 'ลูกชิ้นหมู', price: 7, icon: '🍢' },
-    { id: 'sausage-red', name: 'ไส้กรอกแดง(ทอด)', price: 10, icon: '🌭' },
     { id: 'crab-stick', name: 'ปูอัด', price: 7, icon: '🦀' },
-    { id: 'pork-belly', name: 'หมูสามชั้น', price: 10, icon: '🥓' },
     { id: 'shrimp', name: 'กุ้ง', price: 15, icon: '🦐' },
     { id: 'moo-yor', name: 'หมูยอ', price: 10, icon: '🍥' },
     { id: 'fish-tofu', name: 'เต้าหู้ปลา', price: 10, icon: '⏹️' },
     { id: 'wakame-mushroom', name: 'สาหร่ายวากาเมะพันเห็ดเข็มทอง', price: 15, icon: '🍄' },
     { id: 'sausage-normal', name: 'ไส้กรอกปกติ', price: 7, icon: '🌭' },
-    { id: 'nuggets', name: 'นักเก็ต', price: 10, icon: '🍗' },
-    { id: 'chicken-pop', name: 'ไก่ป๊อป', price: 10, icon: '🍿' },
     { id: 'cheese-tofu', name: 'เต้าหู้ชีส', price: 10, icon: '🧀' },
     { id: 'salted-egg', name: 'ไข่แดงเค็ม', price: 15, icon: '🍳' },
     { id: 'wonton', name: 'เกี๊ยว', price: 10, icon: '🥟' },
-    { id: 'cheese-sausage', name: 'ไส้กรอกชีส', price: 10, icon: '🌭' }
+    { id: 'cheese-sausage', name: 'ไส้กรอกชีส', price: 10, icon: '🌭' },
+    { id: 'sausage-red', name: 'ไส้กรอกแดง(ทอด)', price: 10, icon: '🌭' },
+    { id: 'nuggets', name: 'นักเก็ต', price: 10, icon: '🍗' },
+    { id: 'chicken-pop', name: 'ไก่ป๊อป', price: 10, icon: '🍿' },
+    { id: 'pork-belly', name: 'หมูสามชั้น', price: 10, icon: '🥓' }
 ];
 
 const SPICY_LEVELS = [
-    { label: 'ไม่เผ็ด', desc: 'พริก 0 เม็ด' },
-    { label: 'เผ็ดน้อย', desc: 'พริก 2 เม็ด' },
-    { label: 'เผ็ดกลาง', desc: 'พริก 5 เม็ด' },
-    { label: 'เผ็ดมาก', desc: 'พริก 10 เม็ด' }
+    { label: 'ไม่เผ็ด', desc: 'สำหรับคนไม่ทานเผ็ดเลย❌'},
+    { label: 'เผ็ดน้อย', desc: 'เผ็ดเด็กน้อย👶' },
+    { label: 'เผ็ดกลาง', desc: 'เผ็ดปานกลาง😘' },
+    { label: 'เผ็ดมาก', desc: 'เผ็ดนรกแตก💔' }
 ];
 
 let db, auth;
@@ -193,20 +194,29 @@ window.selectDormLocation = function(locationName) {
     state.order.dormLocation = locationName;
     const btnFemale = document.getElementById('btn-dorm-female1');
     const btnMale = document.getElementById('btn-dorm-male4');
+    const btnStore = document.getElementById('btn-dorm-store');
 
     if (locationName === 'หอหญิง 1') {
         if (btnFemale) btnFemale.className = "p-4 border-2 rounded-2xl text-center font-bold transition-all duration-200 border-orange-500 bg-orange-50 text-orange-800 ring-2 ring-orange-500/15";
         if (btnMale) btnMale.className = "p-4 border-2 rounded-2xl text-center font-bold transition-all duration-200 border-slate-200 hover:border-slate-300 text-slate-700 bg-slate-50/50";
-    } else {
+        if (btnStore) btnStore.className = "p-4 border-2 rounded-2xl text-center font-bold transition-all duration-200 border-slate-200 hover:border-slate-300 text-slate-700 bg-slate-50/50";
+    } 
+    else if (locationName === 'หอชาย 4') {
         if (btnMale) btnMale.className = "p-4 border-2 rounded-2xl text-center font-bold transition-all duration-200 border-orange-500 bg-orange-50 text-orange-800 ring-2 ring-orange-500/15";
         if (btnFemale) btnFemale.className = "p-4 border-2 rounded-2xl text-center font-bold transition-all duration-200 border-slate-200 hover:border-slate-300 text-slate-700 bg-slate-50/50";
+        if (btnStore) btnStore.className = "p-4 border-2 rounded-2xl text-center font-bold transition-all duration-200 border-slate-200 hover:border-slate-300 text-slate-700 bg-slate-50/50";
+    }
+    else if (locationName === 'รับหน้าร้าน') {
+        if (btnMale) btnMale.className = "p-4 border-2 rounded-2xl text-center font-bold transition-all duration-200 border-slate-200 hover:border-slate-300 text-slate-700 bg-slate-50/50";
+        if (btnFemale) btnFemale.className = "p-4 border-2 rounded-2xl text-center font-bold transition-all duration-200 border-slate-200 hover:border-slate-300 text-slate-700 bg-slate-50/50";
+        if (btnStore) btnStore.className = "p-4 border-2 rounded-2xl text-center font-bold transition-all duration-200 border-orange-500 bg-orange-50 text-orange-800 ring-2 ring-orange-500/15";
     }
 };
 
 function updatePricingCalculations() {
     // No base price. Price of food relies on sticks/addons sum.
     const addonsSum = state.order.addons.reduce((acc, curr) => acc + (curr.price * curr.quantity), 0);
-    const deliveryFee = 10; // Fixed delivery fee 10 baht
+    const deliveryFee = 5; // Fixed delivery fee 5 baht
 
     const grandTotal = addonsSum + deliveryFee;
     state.order.totalPrice = grandTotal;
