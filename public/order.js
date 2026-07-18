@@ -14,7 +14,7 @@ const state = {
         spiciness: 'เผ็ดกลาง', // Spicy level default
         custName: '',          // Customer name
         custPhone: '',         // Customer phone number
-        dormLocation: '',      // Selectable location (หอหญิง 1 or หอชาย 4 or รับหน้าร้าน)
+        dormLocation: '',      // Selectable location (หอหญิง 1 or หอชาย 4 or โรงอาหารกลาง or รับหน้าร้าน)
         note: '',              // Cooking notes
         slipBase64: '',        // Encoded proof slip image
         totalPrice: 0,         // Calculated dynamically
@@ -192,25 +192,26 @@ window.resetSaladState = function() {
 
 window.selectDormLocation = function(locationName) {
     state.order.dormLocation = locationName;
-    const btnFemale = document.getElementById('btn-dorm-female1');
-    const btnMale = document.getElementById('btn-dorm-male4');
-    const btnStore = document.getElementById('btn-dorm-store');
 
-    if (locationName === 'หอหญิง 1') {
-        if (btnFemale) btnFemale.className = "p-4 border-2 rounded-2xl text-center font-bold transition-all duration-200 border-orange-500 bg-orange-50 text-orange-800 ring-2 ring-orange-500/15";
-        if (btnMale) btnMale.className = "p-4 border-2 rounded-2xl text-center font-bold transition-all duration-200 border-slate-200 hover:border-slate-300 text-slate-700 bg-slate-50/50";
-        if (btnStore) btnStore.className = "p-4 border-2 rounded-2xl text-center font-bold transition-all duration-200 border-slate-200 hover:border-slate-300 text-slate-700 bg-slate-50/50";
-    } 
-    else if (locationName === 'หอชาย 4') {
-        if (btnMale) btnMale.className = "p-4 border-2 rounded-2xl text-center font-bold transition-all duration-200 border-orange-500 bg-orange-50 text-orange-800 ring-2 ring-orange-500/15";
-        if (btnFemale) btnFemale.className = "p-4 border-2 rounded-2xl text-center font-bold transition-all duration-200 border-slate-200 hover:border-slate-300 text-slate-700 bg-slate-50/50";
-        if (btnStore) btnStore.className = "p-4 border-2 rounded-2xl text-center font-bold transition-all duration-200 border-slate-200 hover:border-slate-300 text-slate-700 bg-slate-50/50";
-    }
-    else if (locationName === 'รับหน้าร้าน') {
-        if (btnMale) btnMale.className = "p-4 border-2 rounded-2xl text-center font-bold transition-all duration-200 border-slate-200 hover:border-slate-300 text-slate-700 bg-slate-50/50";
-        if (btnFemale) btnFemale.className = "p-4 border-2 rounded-2xl text-center font-bold transition-all duration-200 border-slate-200 hover:border-slate-300 text-slate-700 bg-slate-50/50";
-        if (btnStore) btnStore.className = "p-4 border-2 rounded-2xl text-center font-bold transition-all duration-200 border-orange-500 bg-orange-50 text-orange-800 ring-2 ring-orange-500/15";
-    }
+    // 1. ดึงปุ่มทั้งหมดมาเก็บใน Object โดยจับคู่กับชื่อสถานที่
+    const buttons = {
+        'หอหญิง 1': document.getElementById('btn-dorm-female1'),
+        'หอชาย 4': document.getElementById('btn-dorm-male4'),
+        'โรงอาหารกลาง': document.getElementById('btn-dorm-central'),
+        'รับหน้าร้าน': document.getElementById('btn-dorm-store')
+    };
+
+    // 2. กำหนดคลาสสำหรับปุ่มที่เลือก (Active) และไม่ได้เลือก (Inactive)
+    const activeClass = "p-4 border-2 rounded-2xl text-center font-bold transition-all duration-200 border-orange-500 bg-orange-50 text-orange-800 ring-2 ring-orange-500/15";
+    const inactiveClass = "p-4 border-2 rounded-2xl text-center font-bold transition-all duration-200 border-slate-200 hover:border-slate-300 text-slate-700 bg-slate-50/50";
+
+    // 3. วนลูปเช็กทุกปุ่ม ถ้าชื่อตรงกับสถานที่ที่คลิก ให้เป็นสีส้ม ถ้าไม่ตรงให้เป็นสีเทา
+    Object.keys(buttons).forEach(key => {
+        const btn = buttons[key];
+        if (btn) {
+            btn.className = (key === locationName) ? activeClass : inactiveClass;
+        }
+    });
 
     // คำนวณราคาใหม่ทันทีเมื่อเปลี่ยนสถานที่รับอาหาร
     updatePricingCalculations();
@@ -309,7 +310,7 @@ window.goToStep = function(targetStep) {
         const phoneVal = document.getElementById('cust-phone').value.trim();
 
         if (!state.order.dormLocation) {
-            showToast('⚠️ กรุณาเลือกสถานที่จัดส่ง/รับอาหาร (หอหญิง 1, หอชาย 4 หรือ รับหน้าร้าน)', 'error');
+            showToast('⚠️ กรุณาเลือกสถานที่จัดส่ง/รับอาหาร (หอหญิง 1, หอชาย 4, โรงอาหารกลาง หรือ รับหน้าร้าน)', 'error');
             return;
         }
         if (!nameVal) {
