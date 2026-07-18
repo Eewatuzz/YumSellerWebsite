@@ -14,10 +14,10 @@ const state = {
         spiciness: 'เผ็ดกลาง', // Spicy level default
         custName: '',          // Customer name
         custPhone: '',         // Customer phone number
-        dormLocation: '',      // Selectable dorm (หอหญิง 1 or หอชาย 4 or รับหน้าร้าน)
+        dormLocation: '',      // Selectable location (หอหญิง 1 or หอชาย 4 or รับหน้าร้าน)
         note: '',              // Cooking notes
         slipBase64: '',        // Encoded proof slip image
-        totalPrice: 5,         // Default price is delivery fee (5 Baht)
+        totalPrice: 0,         // Calculated dynamically
     }
 };
 
@@ -211,12 +211,20 @@ window.selectDormLocation = function(locationName) {
         if (btnFemale) btnFemale.className = "p-4 border-2 rounded-2xl text-center font-bold transition-all duration-200 border-slate-200 hover:border-slate-300 text-slate-700 bg-slate-50/50";
         if (btnStore) btnStore.className = "p-4 border-2 rounded-2xl text-center font-bold transition-all duration-200 border-orange-500 bg-orange-50 text-orange-800 ring-2 ring-orange-500/15";
     }
+
+    // คำนวณราคาใหม่ทันทีเมื่อเปลี่ยนสถานที่รับอาหาร
+    updatePricingCalculations();
 };
 
 function updatePricingCalculations() {
-    // No base price. Price of food relies on sticks/addons sum.
+    // ผลรวมของเครื่องยำที่เลือกทั้งหมด
     const addonsSum = state.order.addons.reduce((acc, curr) => acc + (curr.price * curr.quantity), 0);
-    const deliveryFee = 5; // Fixed delivery fee 5 baht
+    
+    // ตั้งค่าค่าจัดส่งเป็น 0 เมื่อเลือก "รับหน้าร้าน" และเป็น 5 บาทเมื่อเลือกส่งที่หอพัก
+    let deliveryFee = 5;
+    if (state.order.dormLocation === 'รับหน้าร้าน') {
+        deliveryFee = 0;
+    }
 
     const grandTotal = addonsSum + deliveryFee;
     state.order.totalPrice = grandTotal;
@@ -235,7 +243,9 @@ function updatePricingCalculations() {
     if (addonPriceLabel) addonPriceLabel.innerText = `${addonsSum} บาท`;
 
     const deliveryPriceLabel = document.getElementById('delivery-price-label');
-    if (deliveryPriceLabel) deliveryPriceLabel.innerText = `${deliveryFee} บาท`;
+    if (deliveryPriceLabel) {
+        deliveryPriceLabel.innerText = deliveryFee === 0 ? 'ฟรี (รับเองหน้าร้าน)' : `${deliveryFee} บาท`;
+    }
 
     // Dynamic Receipt Render on step 2
     const receiptSauce = document.getElementById('receipt-sauce');
@@ -299,7 +309,7 @@ window.goToStep = function(targetStep) {
         const phoneVal = document.getElementById('cust-phone').value.trim();
 
         if (!state.order.dormLocation) {
-            showToast('⚠️ กรุณาเลือกหอพักจัดส่ง (หอหญิง 1 หรือ หอชาย 4)', 'error');
+            showToast('⚠️ กรุณาเลือกสถานที่จัดส่ง/รับอาหาร (หอหญิง 1, หอชาย 4 หรือ รับหน้าร้าน)', 'error');
             return;
         }
         if (!nameVal) {
@@ -513,6 +523,7 @@ window.submitFinalOrder = async function() {
         // State Resetting
         state.order.addons = [];
         state.order.slipBase64 = '';
+        state.order.dormLocation = ''; // Reset location as well
         
         const slipInput = document.getElementById('slip-input');
         if (slipInput) slipInput.value = '';
@@ -546,6 +557,11 @@ window.submitFinalOrder = async function() {
 };
 
 function renderReceiptModal(orderId) {
+    const isPickup = state.order.dormLocation === 'รับหน้าร้าน';
+    const locationText = isPickup 
+        ? 'รับของที่หน้าร้านได้เลยค่ะ' 
+        : 'รอรับยำแสนอร่อยได้ที่ใต้หอพักในช่วงเวลา 17.00 - 17.30 น.';
+
     const overlay = document.createElement('div');
     overlay.className = "fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4";
     overlay.innerHTML = `
@@ -561,7 +577,7 @@ function renderReceiptModal(orderId) {
                 <p class="font-bold text-slate-800 flex items-center"><i class="fa-solid fa-circle-info text-orange-500 mr-1.5"></i> ขั้นตอนต่อไปสำหรับคุณ:</p>
                 <p>1. ทางร้านกำลังตรวจสอบรายการสลิปชำระเงินของคุณ</p>
                 <p>2. จัดทำยำสดๆ เตรียมส่งตรงเวลา</p>
-                <p class="font-bold text-rose-600">3. รอรับยำแสนอร่อยได้ที่ใต้หอพักในช่วงเวลา 17.00 - 17.30 น.</p>
+                <p class="font-bold text-rose-600">3. ${locationText}</p>
                 <div class="pt-2 border-t border-slate-200 flex flex-col space-y-1">
                     <span>📢 อย่าลืมกดติดตาม Story IG ร้าน เพื่อดูแจ้งเตือนสถานะเมื่อยำพร้อมส่ง!</span>
                     <a href="https://www.instagram.com/yumsing.mhosab/" target="_blank" class="text-orange-600 font-bold underline hover:text-orange-700 flex items-center">
